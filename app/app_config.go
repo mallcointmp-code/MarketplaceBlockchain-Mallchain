@@ -67,6 +67,14 @@ import (
 	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
 	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	_ "github.com/tmp/marketplace/x/badge/module"
+	badgemoduletypes "github.com/tmp/marketplace/x/badge/types"
+	_ "github.com/tmp/marketplace/x/mallcoin/module"
+	mallcoinmoduletypes "github.com/tmp/marketplace/x/mallcoin/types"
+	_ "github.com/tmp/marketplace/x/mallpoints/module"
+	mallpointsmoduletypes "github.com/tmp/marketplace/x/mallpoints/types"
+	_ "github.com/tmp/marketplace/x/mlcoin/module"
+	mlcoinmoduletypes "github.com/tmp/marketplace/x/mlcoin/types"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
@@ -123,6 +131,10 @@ var (
 						// ibc modules
 						ibcexported.ModuleName,
 						// chain modules
+						mallcoinmoduletypes.ModuleName,
+						mlcoinmoduletypes.ModuleName,
+						mallpointsmoduletypes.ModuleName,
+						badgemoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/beginBlockers
 					},
 					EndBlockers: []string{
@@ -131,6 +143,10 @@ var (
 						feegrant.ModuleName,
 						group.ModuleName,
 						// chain modules
+						mallcoinmoduletypes.ModuleName,
+						mlcoinmoduletypes.ModuleName,
+						mallpointsmoduletypes.ModuleName,
+						badgemoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/endBlockers
 					},
 					// The following is mostly only needed when ModuleName != StoreKey name.
@@ -167,6 +183,10 @@ var (
 						ibctransfertypes.ModuleName,
 						icatypes.ModuleName,
 						// chain modules
+						mallcoinmoduletypes.ModuleName,
+						mlcoinmoduletypes.ModuleName,
+						mallpointsmoduletypes.ModuleName,
+						badgemoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/initGenesis
 					},
 				}),
@@ -262,6 +282,22 @@ var (
 			{
 				Name:   epochstypes.ModuleName,
 				Config: appconfig.WrapAny(&epochsmodulev1.Module{}),
+			},
+			{
+				Name:   mallcoinmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&mallcoinmoduletypes.Module{}),
+			},
+			{
+				Name:   mlcoinmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&mlcoinmoduletypes.Module{}),
+			},
+			{
+				Name:   mallpointsmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&mallpointsmoduletypes.Module{}),
+			},
+			{
+				Name:   badgemoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&badgemoduletypes.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},

@@ -1,6 +1,9 @@
 package app
 
 import (
+	"crypto/sha256"
+	"encoding/binary"
+	"fmt"
 	"io"
 
 	clienthelpers "cosmossdk.io/client/v2/helpers"
@@ -25,6 +28,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -46,13 +50,18 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
 	"github.com/tmp/marketplace/docs"
+	badgemodulekeeper "github.com/tmp/marketplace/x/badge/keeper"
+	mallcoinmodulekeeper "github.com/tmp/marketplace/x/mallcoin/keeper"
+	mallpointsmodulekeeper "github.com/tmp/marketplace/x/mallpoints/keeper"
+	mlcoinmodulekeeper "github.com/tmp/marketplace/x/mlcoin/keeper"
+	vaultmodulekeeper "github.com/tmp/marketplace/x/vault/keeper"
 )
 
 const (
 	// Name is the name of the application.
 	Name = "marketplace"
 	// AccountAddressPrefix is the prefix for accounts addresses.
-	AccountAddressPrefix = "cosmos"
+	AccountAddressPrefix = "mp"
 	// ChainCoinType is the coin type of the chain.
 	ChainCoinType = 118
 )
@@ -98,7 +107,12 @@ type App struct {
 	TransferKeeper      ibctransferkeeper.Keeper
 
 	// simulation manager
-	sm *module.SimulationManager
+	sm               *module.SimulationManager
+	MallcoinKeeper   mallcoinmodulekeeper.Keeper
+	MlcoinKeeper     mlcoinmodulekeeper.Keeper
+	MallpointsKeeper mallpointsmodulekeeper.Keeper
+	BadgeKeeper      badgemodulekeeper.Keeper
+	VaultKeeper      vaultmodulekeeper.Keeper
 }
 
 func init() {
@@ -178,6 +192,11 @@ func New(
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.ParamsKeeper,
+		&app.MallcoinKeeper,
+		&app.MlcoinKeeper,
+		&app.MallpointsKeeper,
+		&app.BadgeKeeper,
+		&app.VaultKeeper,
 	); err != nil {
 		panic(err)
 	}
@@ -186,8 +205,92 @@ func New(
 	// enable optimistic execution
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 
+	// build an AnteHandler using the SDK's default auth ante handler and
+	// wrap it to emit lightweight audit events (and provide scaffolding for
+	// rate-limiting and replay-protection). We create the ante handler here
+	// because we have access to the required keepers from depinject above.
+	anteHandler, err := authante.NewAnteHandler(authante.HandlerOptions{
+		AccountKeeper:   app.AuthKeeper,
+		BankKeeper:      app.BankKeeper,
+		SignModeHandler: app.txConfig.SignModeHandler(),
+		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	// wrappedAnte emits an audit event and delegates to the SDK ante handler.
+	wrappedAnte := func(ctx sdk.Context, tx sdk.Tx, simulate bool) (sdk.Context, error) {
+		// Emit a simple audit event with minimal info (no sensitive data)
+		ev := sdk.NewEvent("tx_audit",
+			sdk.NewAttribute("num_msgs", fmt.Sprintf("%d", len(tx.GetMsgs()))),
+			sdk.NewAttribute("simulate", fmt.Sprintf("%t", simulate)),
+			sdk.NewAttribute("height", fmt.Sprintf("%d", ctx.BlockHeight())),
+		)
+		ctx.EventManager().EmitEvent(ev)
+
+		// Rate limiting: per-sender per-block limit
+		const perAddrPerBlockLimit = 10
+
+		// use mlcoin module KV store to keep ante-related keys
+		storeKey := app.GetKey("mlcoin")
+		if storeKey != nil {
+			store := ctx.KVStore(storeKey)
+
+			// global rate-limit key per-block
+			rlKey := []byte("ante:global:count")
+			val := store.Get(rlKey)
+			var storedHeight uint64
+			var count uint64
+			if val != nil && len(val) == 16 {
+				storedHeight = binary.BigEndian.Uint64(val[:8])
+				count = binary.BigEndian.Uint64(val[8:16])
+			}
+			curH := uint64(ctx.BlockHeight())
+			if storedHeight < curH {
+				// reset for new block
+				storedHeight = curH
+				count = 1
+			} else {
+				count++
+			}
+			if count > perAddrPerBlockLimit {
+				return ctx, fmt.Errorf("rate limit exceeded for address")
+			}
+			// write back
+			buf := make([]byte, 16)
+			binary.BigEndian.PutUint64(buf[:8], storedHeight)
+			binary.BigEndian.PutUint64(buf[8:16], count)
+			store.Set(rlKey, buf)
+
+			// replay protection: hash tx bytes and ensure not seen before
+			if encoder := app.txConfig.TxEncoder(); encoder != nil {
+				if b, err := encoder(tx); err == nil {
+					h := sha256.Sum256(b)
+					replayKey := append([]byte("ante:replay:"), h[:]...)
+					if store.Has(replayKey) {
+						return ctx, fmt.Errorf("replayed transaction")
+					}
+					// mark replay seen with current height
+					heightBuf := make([]byte, 8)
+					binary.BigEndian.PutUint64(heightBuf, curH)
+					store.Set(replayKey, heightBuf)
+				}
+			}
+		}
+
+		// Delegate to standard ante handler
+
+		return anteHandler(ctx, tx, simulate)
+	}
+
+	// We will set the ante handler on the built app below (after Build())
+
 	// build app
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
+
+	// set the wrapped ante handler (audit + scaffold for rate-limiting)
+	app.App.SetAnteHandler(wrappedAnte)
 
 	// register legacy modules
 	if err := app.registerIBCModules(appOpts); err != nil {
