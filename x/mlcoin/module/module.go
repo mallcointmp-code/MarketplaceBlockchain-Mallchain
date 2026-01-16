@@ -136,6 +136,8 @@ func (am AppModule) BeginBlock(ctx context.Context) error {
 	// run community-driven FX rate updater each block
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	am.keeper.UpdateCurrencyRatesFromCommunity(sdkCtx)
+	// compute scarcity emission scale from stored metrics and persist
+	_ = am.keeper.ComputeAndStoreScarcityScale(sdkCtx)
 	return nil
 }
 

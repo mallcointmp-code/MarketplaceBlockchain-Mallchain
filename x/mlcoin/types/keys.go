@@ -26,4 +26,11 @@ var (
 	KesBalanceKey       = collections.NewPrefix("kesBalance/value/")
 	TradeHistoryKey     = collections.NewPrefix("tradeHistory/value/")
 	CurrencyRateKey     = collections.NewPrefix("currencyRate/value/")
+	// Scarcity-related keys
+	ScarcityParamsKey           = collections.NewPrefix("scarcity/params/")
+	ScarcityMetricsKey          = collections.NewPrefix("scarcity/metrics/")
+	ScarcityActiveWalletsKey    = collections.NewPrefix("scarcity/active_wallets/")
+	ScarcitySettlementVolumeKey = collections.NewPrefix("scarcity/settlement_volume/")
+	ScarcityOrderCountKey       = collections.NewPrefix("scarcity/order_count/")
+	ScarcityCurrentScaleKey     = collections.NewPrefix("scarcity/current_scale/")
 )
