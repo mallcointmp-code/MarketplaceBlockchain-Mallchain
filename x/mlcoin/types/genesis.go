@@ -16,8 +16,14 @@ func DefaultGenesis() *GenesisState {
 			{
 				Index:   "marketplace1founder000000000000000000000000000",
 				Address: "marketplace1founder000000000000000000000000000",
-				Balance: 250000000000000, // 250M MLCN (in micro units)
-				Locked:  250000000000000, // All locked initially
+				Balance: 160000000000000, // 160M MLCN (in micro units) - after transferring 90M to Team
+				Locked:  160000000000000, // Adjust locked amount accordingly
+			},
+			{
+				Index:   "marketplace1team0000000000000000000000000000000",
+				Address: "marketplace1team0000000000000000000000000000000",
+				Balance: 90000000000000, // 90M MLCN
+				Locked:  0,
 			},
 			{
 				Index:   "marketplace1afa0000000000000000000000000000000",

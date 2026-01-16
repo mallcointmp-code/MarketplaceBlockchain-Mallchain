@@ -1,0 +1,39 @@
+{
+  "params": {
+    "burn_wallet": "burn_wallet"
+  },
+  "wallet_balance_map": [
+    {
+      "index": "marketplace1founder000000000000000000000000000",
+      "address": "marketplace1founder000000000000000000000000000",
+      "balance": 160000000000000,
+      "locked": 160000000000000
+    },
+    {
+      "index": "marketplace1team0000000000000000000000000000000",
+      "address": "marketplace1team0000000000000000000000000000000",
+      "balance": 90000000000000
+    },
+    {
+      "index": "marketplace1afa0000000000000000000000000000000",
+      "address": "marketplace1afa0000000000000000000000000000000",
+      "balance": 1500000000000
+    },
+    {
+      "index": "marketplace1orthophsrm00000000000000000000000",
+      "address": "marketplace1orthophsrm00000000000000000000000",
+      "balance": 3000000000000
+    }
+  ],
+  "emission_state": {
+    "total_supply": 670000000000000,
+    "circulating": 4500000000000,
+    "monthly_cap": 250000000000,
+    "daily_limit": 8333333333,
+    "current_month": 1,
+    "current_day": 1
+  },
+  "transaction_map": [],
+  "kes_balance_map": null,
+  "trade_history": null
+}
