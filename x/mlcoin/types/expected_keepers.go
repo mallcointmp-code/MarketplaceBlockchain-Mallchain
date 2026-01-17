@@ -25,3 +25,9 @@ type ParamSubspace interface {
 	Get(context.Context, []byte, interface{})
 	Set(context.Context, []byte, interface{})
 }
+
+// MlcoinKeeper defines the expected interface for the Mlcoin module used by other modules.
+type MlcoinKeeper interface {
+	MintToWallet(ctx context.Context, address string, amount uint64) error
+	WithMintingEnabled(ctx context.Context, fn func() error) error
+}
