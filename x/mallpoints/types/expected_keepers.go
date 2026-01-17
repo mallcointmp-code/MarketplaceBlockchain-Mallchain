@@ -5,6 +5,8 @@ import (
 
 	"cosmossdk.io/core/address"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	mlcointypes "github.com/tmp/marketplace/x/mlcoin/types"
 )
 
 // AuthKeeper defines the expected interface for the Auth module.
@@ -31,8 +33,6 @@ type BadgeKeeper interface {
 	HasUserBadge(ctx context.Context, address string) bool
 }
 
-// MlcoinKeeper defines the expected interface for the Mlcoin module.
-type MlcoinKeeper interface {
-	MintToWallet(ctx context.Context, address string, amount uint64) error
-	WithMintingEnabled(ctx context.Context, fn func() error) error
-}
+// MlcoinKeeper is an alias to the Mlcoin module's expected keeper interface.
+// This ensures a single concrete interface type is used across modules for depinject.
+type MlcoinKeeper = mlcointypes.MlcoinKeeper
