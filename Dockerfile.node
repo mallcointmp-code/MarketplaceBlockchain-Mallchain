@@ -1,0 +1,20 @@
+FROM golang:1.20-alpine AS build
+
+RUN apk add --no-cache git build-base bash
+
+WORKDIR /src
+COPY . /src
+
+ENV CGO_ENABLED=0
+
+# Build the app binary
+RUN go build -o /usr/local/bin/marketplaced ./cmd/marketplaced
+
+FROM alpine:3.18
+RUN apk add --no-cache bash ca-certificates
+COPY --from=build /usr/local/bin/marketplaced /usr/local/bin/marketplaced
+COPY scripts /scripts
+RUN chmod +x /scripts/*.sh
+
+WORKDIR /data
+ENTRYPOINT ["/scripts/node-entrypoint.sh"]

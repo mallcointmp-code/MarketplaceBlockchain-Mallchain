@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  validator:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: marketplace-validator
+    command: ["/scripts/node-entrypoint.sh"]
+    volumes:
+      - validator-data:/data
+    ports:
+      - "26656:26656"
+      - "26657:26657"
+
+  cli:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: marketplace-cli
+    depends_on:
+      - validator
+    entrypoint: ["/scripts/cli-run.sh"]
+    volumes:
+      - validator-data:/data:ro
+
+volumes:
+  validator-data:

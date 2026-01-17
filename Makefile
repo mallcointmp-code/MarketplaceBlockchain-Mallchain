@@ -25,6 +25,14 @@ docker-e2e:
 docker-clean:
 	@echo "Removing e2e container"
 	@docker rm -f marketplace-e2e || true
+
+multinode-e2e:
+	@echo "Running multi-node docker-compose E2E"
+	@docker compose -f docker-compose.multinode.yml up --build --abort-on-container-exit --exit-code-from cli
+
+multinode-clean:
+	@echo "Tearing down multinode compose"
+	@docker compose -f docker-compose.multinode.yml down -v || true
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT := $(shell git log -1 --format='%H')
 APPNAME := marketplace
