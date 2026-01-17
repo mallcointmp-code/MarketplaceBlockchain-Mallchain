@@ -27,8 +27,8 @@ func TestAssignKeysToAllWallets(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEqual(t, "old1", got.Address)
 
-	// log the keys so the operator can capture them from test output
+	// log the keys so the operator can capture them from test output; include index
 	for _, a := range assigned {
-		t.Logf("OLD=%s NEW=%s PRIV=%s", a.OldAddress, a.NewAddress, a.PrivHex)
+		t.Logf("IDX=%s OLD=%s NEW=%s PRIV=%s", a.Index, a.OldAddress, a.NewAddress, a.PrivHex)
 	}
 }

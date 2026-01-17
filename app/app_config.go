@@ -75,6 +75,8 @@ import (
 	mallpointsmoduletypes "github.com/tmp/marketplace/x/mallpoints/types"
 	_ "github.com/tmp/marketplace/x/mlcoin/module"
 	mlcoinmoduletypes "github.com/tmp/marketplace/x/mlcoin/types"
+	_ "github.com/tmp/marketplace/x/treasury/module"
+	treasurymoduletypes "github.com/tmp/marketplace/x/treasury/types"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
@@ -89,6 +91,7 @@ var (
 		{Account: nft.ModuleName},
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: icatypes.ModuleName},
+		{Account: treasurymoduletypes.ModuleName},
 	}
 
 	// blocked account addresses

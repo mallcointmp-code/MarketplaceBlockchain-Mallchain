@@ -54,6 +54,7 @@ import (
 	mallcoinmodulekeeper "github.com/tmp/marketplace/x/mallcoin/keeper"
 	mallpointsmodulekeeper "github.com/tmp/marketplace/x/mallpoints/keeper"
 	mlcoinmodulekeeper "github.com/tmp/marketplace/x/mlcoin/keeper"
+	treasurymodulekeeper "github.com/tmp/marketplace/x/treasury/keeper"
 	vaultmodulekeeper "github.com/tmp/marketplace/x/vault/keeper"
 )
 
@@ -113,6 +114,7 @@ type App struct {
 	MallpointsKeeper mallpointsmodulekeeper.Keeper
 	BadgeKeeper      badgemodulekeeper.Keeper
 	VaultKeeper      vaultmodulekeeper.Keeper
+	TreasuryKeeper   treasurymodulekeeper.Keeper
 }
 
 func init() {
@@ -197,6 +199,7 @@ func New(
 		&app.MallpointsKeeper,
 		&app.BadgeKeeper,
 		&app.VaultKeeper,
+		&app.TreasuryKeeper,
 	); err != nil {
 		panic(err)
 	}

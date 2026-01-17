@@ -1,0 +1,42 @@
+syntax = "proto3";
+package tmp.marketplace.treasury;
+
+option go_package = "github.com/tmp/marketplace/x/treasury/types;types";
+
+// MsgCreateMultisig creates a multisig wallet.
+message MsgCreateMultisig {
+  string index = 1;
+  // creator is the address creating the multisig (bech32)
+  string creator = 5;
+  repeated string members = 2;
+  uint32 threshold = 3;
+  uint64 balance = 4;
+}
+
+message MsgCreateMultisigResponse {}
+
+// MsgScheduleDisbursement schedules a disbursement from a multisig.
+message MsgScheduleDisbursement {
+  string index = 1;
+  string from = 2;
+  string to = 3;
+  uint64 amount = 4;
+  int64 release_at_unix = 5;
+}
+
+message MsgScheduleDisbursementResponse {}
+
+// MsgApproveDisbursement records an approval from a multisig member.
+message MsgApproveDisbursement {
+  string index = 1;
+  string approver = 2;
+}
+
+message MsgApproveDisbursementResponse {}
+
+// Msg service for treasury operations.
+service Msg {
+  rpc CreateMultisig(MsgCreateMultisig) returns (MsgCreateMultisigResponse);
+  rpc ScheduleDisbursement(MsgScheduleDisbursement) returns (MsgScheduleDisbursementResponse);
+  rpc ApproveDisbursement(MsgApproveDisbursement) returns (MsgApproveDisbursementResponse);
+}

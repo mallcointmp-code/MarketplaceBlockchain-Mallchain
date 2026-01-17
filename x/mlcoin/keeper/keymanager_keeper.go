@@ -23,6 +23,7 @@ func (k Keeper) GenerateAndExportWallet(ctx context.Context) (string, string, er
 
 // AssignedKey describes a generated key assignment for an existing wallet entry.
 type AssignedKey struct {
+	Index      string
 	OldAddress string
 	NewAddress string
 	PrivHex    string
@@ -45,7 +46,7 @@ func (k Keeper) AssignKeysToAllWallets(ctx context.Context) ([]AssignedKey, erro
 			return true, err
 		}
 
-		out = append(out, AssignedKey{OldAddress: old, NewAddress: newAddr, PrivHex: privHex})
+		out = append(out, AssignedKey{Index: idx, OldAddress: old, NewAddress: newAddr, PrivHex: privHex})
 		return false, nil
 	})
 	if err != nil {
