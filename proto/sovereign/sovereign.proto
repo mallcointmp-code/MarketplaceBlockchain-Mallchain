@@ -1,0 +1,46 @@
+syntax = "proto3";
+package sovereign;
+
+option go_package = "github.com/tmp/marketplace/x/sovereign/types";
+
+import "google/protobuf/timestamp.proto";
+
+message FounderCap {
+  uint64 total_cap = 1;
+  uint64 initial_transfer_cap = 2;
+  google.protobuf.Timestamp cap_start = 3;
+  google.protobuf.Timestamp cap_end = 4;
+}
+
+message Lock {
+  string address = 1;
+  google.protobuf.Timestamp unlock_at = 2;
+  FounderCap founder = 3;
+  bool exempt = 4;
+}
+
+message GenesisState {
+  repeated Lock locks = 1;
+}
+
+message QueryLockRequest {
+  string address = 1;
+}
+
+message QueryLockResponse {
+  Lock lock = 1;
+}
+
+message QueryRemainingCapRequest {
+  string address = 1;
+}
+
+message QueryRemainingCapResponse {
+  uint64 remaining = 1;
+  google.protobuf.Timestamp cap_end = 2;
+}
+
+service Query {
+  rpc Lock(QueryLockRequest) returns (QueryLockResponse) {}
+  rpc RemainingCap(QueryRemainingCapRequest) returns (QueryRemainingCapResponse) {}
+}
