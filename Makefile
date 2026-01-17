@@ -16,6 +16,23 @@ test:
 ci-e2e: fmt vet test
 	@echo "CI E2E: formatting, vet, and tests completed"
 
+.PHONY: codegen
+codegen:
+	@echo "Running buf code generation (Go + gateway + swagger + ts if configured)"
+	@if [ -f proto/buf.gen.gogo.yaml ]; then \
+		buf generate --template proto/buf.gen.gogo.yaml || exit 1; \
+	fi
+	@if [ -f proto/buf.gen.swagger.yaml ]; then \
+		buf generate --template proto/buf.gen.swagger.yaml || true; \
+	fi
+	@if [ -f proto/buf.gen.ts.yaml ]; then \
+		buf generate --template proto/buf.gen.ts.yaml || true; \
+	fi
+	@if [ -f proto/buf.gen.sta.yaml ]; then \
+		buf generate --template proto/buf.gen.sta.yaml || true; \
+	fi
+
+
 .PHONY: docker-e2e docker-clean
 
 docker-e2e:
