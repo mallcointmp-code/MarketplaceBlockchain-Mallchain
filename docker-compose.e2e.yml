@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  e2e:
+    build:
+      context: .
+      dockerfile: Dockerfile.e2e
+    container_name: marketplace-e2e
+    working_dir: /src
+    tty: true
+    # Keep simple: tests run inside container on start
+    # Use --abort-on-container-exit from docker-compose to propagate exit codes

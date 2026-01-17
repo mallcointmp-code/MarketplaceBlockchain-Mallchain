@@ -1,3 +1,30 @@
+SHELL := /bin/bash
+
+.PHONY: fmt vet test ci-e2e
+
+fmt:
+	@gofmt -w .
+
+vet:
+	@echo "running go vet..."
+	@go vet ./...
+
+test:
+	@echo "running unit tests..."
+	@go test ./... 
+
+ci-e2e: fmt vet test
+	@echo "CI E2E: formatting, vet, and tests completed"
+
+.PHONY: docker-e2e docker-clean
+
+docker-e2e:
+	@echo "Running containerized E2E via docker-compose..."
+	@docker compose -f docker-compose.e2e.yml up --build --abort-on-container-exit --exit-code-from e2e
+
+docker-clean:
+	@echo "Removing e2e container"
+	@docker rm -f marketplace-e2e || true
 BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT := $(shell git log -1 --format='%H')
 APPNAME := marketplace

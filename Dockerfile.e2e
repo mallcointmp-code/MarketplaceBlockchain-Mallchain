@@ -1,0 +1,16 @@
+FROM golang:1.20-alpine
+
+RUN apk add --no-cache git build-base bash
+
+WORKDIR /src
+
+# Copy repository into container
+COPY . /src
+
+ENV CGO_ENABLED=0
+
+WORKDIR /src
+
+RUN go env -w GOPROXY=https://proxy.golang.org || true
+
+CMD ["/bin/sh","/src/scripts/run-e2e.sh"]
