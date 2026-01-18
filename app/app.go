@@ -151,7 +151,7 @@ func New(
 		appBuilder *runtime.AppBuilder
 
 		// merge the AppConfig and other configuration in one config
-		diCfg := depinject.Configs(
+		diCfg depinject.Config = depinject.Configs(
 			appConfig,
 			depinject.Supply(
 				appOpts, // supply app options
