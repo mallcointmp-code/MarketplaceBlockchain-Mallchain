@@ -150,45 +150,38 @@ func New(
 		app        = &App{}
 		appBuilder *runtime.AppBuilder
 
-		// merge the AppConfig and other configuration in one config
-		diCfg depinject.Config = depinject.Configs(
-			appConfig,
-			depinject.Supply(
-				appOpts, // supply app options
-				logger,  // supply logger
-
-				// Supply with IBC keeper getter for the IBC modules with App Wiring.
-				// The IBC Keeper cannot be passed because it has not been initiated yet.
-				// Passing the getter, the app IBC Keeper will always be accessible.
-				// This needs to be removed after IBC supports App Wiring.
-				app.GetIBCKeeper,
-
-				// here alternative options can be supplied to the DI container.
-				// those options can be used f.e to override the default behavior of some modules.
-				// for instance supplying a custom address codec for not using bech32 addresses.
-				// read the depinject documentation and depinject module wiring for more information
-				// on available options and how to use them.
-
-				// supply custom module basics
-				map[string]module.AppModuleBasic{
-					genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
-				},
-
-				// supply treasury module provider explicitly for app wiring
-				depinject.Provide(
-					treasurymodule.ProvideModule,
-				),
-
-				// supply sovereign module provider explicitly for app wiring
-				depinject.Provide(
-					sovereignmodule.ProvideModule,
-				),
-			),
-		)
+		// Note: pass AppConfig and other DI options directly to depinject.Inject
+		// instead of composing them into a single Config to avoid duplicate
+		// provisioning of internal depinject types.
 	)
 
 	var appModules map[string]appmodule.AppModule
-	if err := depinject.Inject(diCfg,
+	if err := depinject.Inject(
+		AppConfig(),
+		depinject.Supply(
+			appOpts, // supply app options
+			logger,  // supply logger
+
+			// Supply with IBC keeper getter for the IBC modules with App Wiring.
+			// The IBC Keeper cannot be passed because it has not been initiated yet.
+			// Passing the getter, the app IBC Keeper will always be accessible.
+			// This needs to be removed after IBC supports App Wiring.
+			app.GetIBCKeeper,
+
+			// supply custom module basics
+			map[string]module.AppModuleBasic{
+				genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
+			},
+		),
+		// supply treasury module provider explicitly for app wiring
+		depinject.Provide(
+			treasurymodule.ProvideModule,
+		),
+		// supply sovereign module provider explicitly for app wiring
+		depinject.Provide(
+			sovereignmodule.ProvideModule,
+		),
+
 		&appBuilder,
 		&appModules,
 		&app.appCodec,
