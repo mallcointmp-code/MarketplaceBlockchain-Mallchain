@@ -56,6 +56,7 @@ import (
 	mlcointypes "github.com/tmp/marketplace/x/mlcoin/types"
 	sovereignante "github.com/tmp/marketplace/x/sovereign/ante"
 	sovereignkeeper "github.com/tmp/marketplace/x/sovereign/keeper"
+	sovereignmodule "github.com/tmp/marketplace/x/sovereign/module"
 	treasurymodulekeeper "github.com/tmp/marketplace/x/treasury/keeper"
 	treasurymodule "github.com/tmp/marketplace/x/treasury/module"
 	// vault module is intentionally not injected into the App struct to avoid
