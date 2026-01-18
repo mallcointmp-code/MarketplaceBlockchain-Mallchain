@@ -167,12 +167,9 @@ func New(
 				genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
 			},
 		),
-		depinject.Provide(
-			treasurymodule.ProvideModule,
-		),
-		depinject.Provide(
-			sovereignmodule.ProvideModule,
-		),
+		// module providers are registered via app_config imports; avoid
+		// explicit depinject.Provide calls here which can introduce
+		// one-per-module dependency errors.
 	)
 
 	if err := depinject.Inject(diCfg,
