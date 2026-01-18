@@ -156,32 +156,26 @@ func New(
 	)
 
 	var appModules map[string]appmodule.AppModule
-	if err := depinject.Inject(
+	// compose a single depinject.Config from AppConfig and runtime supplies
+	diCfg := depinject.Configs(
 		AppConfig(),
 		depinject.Supply(
-			appOpts, // supply app options
-			logger,  // supply logger
-
-			// Supply with IBC keeper getter for the IBC modules with App Wiring.
-			// The IBC Keeper cannot be passed because it has not been initiated yet.
-			// Passing the getter, the app IBC Keeper will always be accessible.
-			// This needs to be removed after IBC supports App Wiring.
+			appOpts,
+			logger,
 			app.GetIBCKeeper,
-
-			// supply custom module basics
 			map[string]module.AppModuleBasic{
 				genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
 			},
 		),
-		// supply treasury module provider explicitly for app wiring
 		depinject.Provide(
 			treasurymodule.ProvideModule,
 		),
-		// supply sovereign module provider explicitly for app wiring
 		depinject.Provide(
 			sovereignmodule.ProvideModule,
 		),
+	)
 
+	if err := depinject.Inject(diCfg,
 		&appBuilder,
 		&appModules,
 		&app.appCodec,
