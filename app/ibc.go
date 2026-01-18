@@ -30,6 +30,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 	solomachine "github.com/cosmos/ibc-go/v10/modules/light-clients/06-solomachine"
 	ibctm "github.com/cosmos/ibc-go/v10/modules/light-clients/07-tendermint"
+	treasurymoduletypes "github.com/tmp/marketplace/x/treasury/types"
 )
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -40,6 +41,7 @@ func (app *App) registerIBCModules(appOpts servertypes.AppOptions) error {
 		storetypes.NewKVStoreKey(ibctransfertypes.StoreKey),
 		storetypes.NewKVStoreKey(icahosttypes.StoreKey),
 		storetypes.NewKVStoreKey(icacontrollertypes.StoreKey),
+		storetypes.NewKVStoreKey(treasurymoduletypes.StoreKey),
 	); err != nil {
 		return err
 	}

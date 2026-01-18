@@ -1,7 +1,16 @@
 package app
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
+	"reflect"
+
+	sdkmath "cosmossdk.io/math"
+	secp256k1 "github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	sims "github.com/cosmos/cosmos-sdk/testutil/sims"
+
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	clienthelpers "cosmossdk.io/client/v2/helpers"
 	"cosmossdk.io/core/appmodule"
@@ -47,6 +56,7 @@ import (
 
 	"github.com/tmp/marketplace/docs"
 	treasurymodulekeeper "github.com/tmp/marketplace/x/treasury/keeper"
+	treasurymoduletypes "github.com/tmp/marketplace/x/treasury/types"
 )
 
 const (
@@ -100,7 +110,15 @@ type App struct {
 
 	// simulation manager
 	sm             *module.SimulationManager
-	TreasuryKeeper *treasurymodulekeeper.Keeper
+	TreasuryKeeper treasurymoduletypes.TreasuryKeeper
+}
+
+// bankAdapter adapts the concrete bank keeper to the treasury module's
+// expected BankKeeper interface in `x/treasury/types`.
+type bankAdapter struct{ bk bankkeeper.Keeper }
+
+func (a bankAdapter) SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipient sdk.AccAddress, amt sdk.Coins) error {
+	return a.bk.SendCoinsFromModuleToAccount(ctx, senderModule, recipient, amt)
 }
 
 func init() {
@@ -184,6 +202,11 @@ func New(
 		panic(err)
 	}
 
+	// sanity checks to help debug DI wiring
+	if appBuilder == nil {
+		panic("depinject: appBuilder is nil after Inject; check module providers and appConfig")
+	}
+
 	// add to default baseapp options
 	// enable optimistic execution
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
@@ -191,9 +214,82 @@ func New(
 	// build app
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
 
+	if app.App == nil {
+		panic("depinject: built runtime App is nil; module wiring may be incomplete")
+	}
+
+	// ensure underlying BaseApp was created
+	if app.App.BaseApp == nil {
+		panic("depinject: runtime App has nil BaseApp; runtime wiring incomplete")
+	}
+
+	// debug: report module manager state
+	if app.ModuleManager == nil {
+		fmt.Println("depinject: runtime App has nil ModuleManager")
+	} else {
+		fmt.Printf("depinject: runtime App ModuleManager has %d modules\n", len(app.ModuleManager.Modules))
+	}
+
+	for name := range app.ModuleManager.Modules {
+		fmt.Println("depinject: module registered:", name)
+	}
+
+	// print mounted commit multi-store keys
+	if cms := app.App.CommitMultiStore(); cms != nil {
+		fmt.Println("depinject: mounted store keys:")
+		if keyed, ok := cms.(interface {
+			StoreKeysByName() map[string]storetypes.StoreKey
+		}); ok {
+			for name, sk := range keyed.StoreKeysByName() {
+				ptr := uintptr(0)
+				rv := reflect.ValueOf(sk)
+				if rv.IsValid() {
+					// underlying should be a pointer type
+					if rv.Kind() == reflect.Ptr {
+						ptr = rv.Pointer()
+					}
+				}
+				fmt.Printf(" - %s (type=%T ptr=%#x)\n", name, sk, ptr)
+			}
+
+			// also print the pointer for the store key returned by UnsafeFindStoreKey for auth
+			sk := app.UnsafeFindStoreKey(authtypes.StoreKey)
+			if sk == nil {
+				fmt.Println("depinject: UnsafeFindStoreKey returned nil for auth store key")
+			} else {
+				rv := reflect.ValueOf(sk)
+				ptr := uintptr(0)
+				if rv.IsValid() && rv.Kind() == reflect.Ptr {
+					ptr = rv.Pointer()
+				}
+				fmt.Printf("depinject: UnsafeFindStoreKey(%s) -> type=%T ptr=%#x\n", authtypes.StoreKey, sk, ptr)
+			}
+		} else {
+			fmt.Println("depinject: CommitMultiStore does not expose StoreKeysByName()")
+		}
+	} else {
+		fmt.Println("depinject: CommitMultiStore is nil")
+	}
+
+	// MultiStore inspection moved later (after InitChain / module registration)
+
+	// NOTE: genesis InitChain must run after loading the commit multi-store
+	// to ensure the root commit stores are populated before any branched
+	// CacheMultiStore is created. The actual InitChain call will be performed
+	// after `app.Load(loadLatest)` below if the chain has no commits.
+
 	// register legacy modules
 	if err := app.registerIBCModules(appOpts); err != nil {
 		panic(err)
+	}
+
+	// Ensure treasury keeper exists: some module wiring may not expose the keeper
+	// directly into the app struct via depinject. In that case, construct it
+	// here using a KVStoreService backed by the keyed store and the BankKeeper.
+	if app.TreasuryKeeper == nil {
+		storeSvc := runtime.NewKVStoreService(app.GetKey(treasurymoduletypes.StoreKey))
+		adapter := bankAdapter{bk: app.BankKeeper}
+		app.TreasuryKeeper = treasurymodulekeeper.NewKeeperWithBank(storeSvc, app.appCodec, adapter, treasurymoduletypes.ModuleName)
 	}
 
 	/****  Module Options ****/
@@ -219,6 +315,100 @@ func New(
 
 	if err := app.Load(loadLatest); err != nil {
 		panic(err)
+	}
+
+	// if DB is empty (no commits), initialize genesis so BaseApp volatile state is set
+	if app.LastCommitID().Version == 0 {
+		gen := appBuilder.DefaultGenesis()
+
+		// create a minimal validator set and genesis account so staking init doesn't panic
+		valSet, err := sims.CreateRandomValidatorSet()
+		if err != nil {
+			panic(err)
+		}
+
+		// create a genesis account with a large balance
+		priv := secp256k1.GenPrivKey()
+		pub := priv.PubKey()
+		ba := authtypes.NewBaseAccount(pub.Address().Bytes(), pub, 0, 0)
+		genAccs := []authtypes.GenesisAccount{ba}
+		balances := []banktypes.Balance{{Address: ba.GetAddress().String(), Coins: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdkmath.NewInt(100000000000000)))}}
+
+		genState, err := sims.GenesisStateWithValSet(app.appCodec, gen, valSet, genAccs, balances...)
+		if err != nil {
+			panic(err)
+		}
+
+		bz, err := json.Marshal(genState)
+		if err != nil {
+			panic(err)
+		}
+
+		if _, err := app.App.InitChain(&abci.RequestInitChain{AppStateBytes: bz}); err != nil {
+			panic(err)
+		}
+	}
+
+	// Now that modules are registered and state is loaded, create a context and inspect
+	// the MultiStore internals (cachemulti) via reflection to compare the internal
+	// store map keys with the StoreKeysByName() entries.
+	if app.App != nil && app.App.BaseApp != nil {
+		// safe to create context now
+		ctx := app.App.BaseApp.NewContext(false)
+		fmt.Println("depinject: inspecting MultiStore obtained from BaseApp.NewContext(false)")
+		ms := ctx.MultiStore()
+		rv := reflect.ValueOf(ms)
+		if !rv.IsValid() {
+			fmt.Println("depinject: MultiStore reflect.Value is invalid")
+		} else {
+			fmt.Printf("depinject: MultiStore reflect kind=%s type=%s\n", rv.Kind(), rv.Type())
+			if rv.Kind() == reflect.Interface || rv.Kind() == reflect.Ptr {
+				rv = rv.Elem()
+			}
+			if rv.IsValid() && rv.Kind() == reflect.Struct {
+				rt := rv.Type()
+				for i := 0; i < rv.NumField(); i++ {
+					f := rv.Field(i)
+					fname := rt.Field(i).Name
+					fmt.Printf("depinject: MultiStore.field %s kind=%s type=%s\n", fname, f.Kind(), f.Type())
+					if f.Kind() == reflect.Map {
+						kt := f.Type().Key()
+						fmt.Printf("depinject:  - map key type=%s len=%d\n", kt.String(), f.Len())
+						if f.Len() > 0 {
+							for _, k := range f.MapKeys() {
+								ptr := uintptr(0)
+								if k.Kind() == reflect.Ptr {
+									ptr = k.Pointer()
+								}
+								fmt.Printf("depinject:    - map key type=%s kind=%s ptr=%#x\n", k.Type(), k.Kind(), ptr)
+								// if this is the `keys` map (map[string]StoreKey) print the StoreKey value pointer too
+								if k.Kind() == reflect.String {
+									val := f.MapIndex(k)
+									if val.IsValid() {
+										// val should be an interface containing a StoreKey
+										if val.Kind() == reflect.Interface || val.Kind() == reflect.Ptr {
+											vv := val
+											if vv.Kind() == reflect.Interface {
+												vv = vv.Elem()
+											}
+											if vv.IsValid() && (vv.Kind() == reflect.Ptr) {
+												fmt.Printf("depinject:      -> store key value type=%s ptr=%#x for name=%s\n", vv.Type(), vv.Pointer(), k.String())
+											} else {
+												fmt.Printf("depinject:      -> store key value type=%s kind=%s for name=%s\n", vv.Type(), vv.Kind(), k.String())
+											}
+										}
+									}
+								}
+							}
+						} else {
+							fmt.Println("depinject:    - map is empty")
+						}
+					}
+				}
+			} else {
+				fmt.Println("depinject: MultiStore is not a struct after deref; skipping field inspection")
+			}
+		}
 	}
 
 	return app

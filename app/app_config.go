@@ -37,6 +37,7 @@ import (
 	_ "cosmossdk.io/x/upgrade"    // import for side-effects
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
+	_ "github.com/cosmos/cosmos-sdk/x/auth"           // import for side-effects (register auth providers)
 	_ "github.com/cosmos/cosmos-sdk/x/auth/tx/config" // import for side-effects
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	_ "github.com/cosmos/cosmos-sdk/x/auth/vesting" // import for side-effects
@@ -75,7 +76,7 @@ import (
 	mallpointsmoduletypes "github.com/tmp/marketplace/x/mallpoints/types"
 	_ "github.com/tmp/marketplace/x/mlcoin/module"
 	mlcoinmoduletypes "github.com/tmp/marketplace/x/mlcoin/types"
-    _ "github.com/tmp/marketplace/x/sovereign/module"
+	_ "github.com/tmp/marketplace/x/sovereign/module"
 
 	_ "github.com/tmp/marketplace/x/treasury/module"
 	treasurymoduletypes "github.com/tmp/marketplace/x/treasury/types"
@@ -94,7 +95,7 @@ var (
 		{Account: nft.ModuleName},
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: icatypes.ModuleName},
-		{Account: treasurymoduletypes.ModuleName},
+		{Account: treasurymoduletypes.ModuleName, Permissions: []string{authtypes.Minter}},
 	}
 
 	// blocked account addresses
