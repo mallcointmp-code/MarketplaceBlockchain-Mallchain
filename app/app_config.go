@@ -75,8 +75,11 @@ import (
 	mallpointsmoduletypes "github.com/tmp/marketplace/x/mallpoints/types"
 	_ "github.com/tmp/marketplace/x/mlcoin/module"
 	mlcoinmoduletypes "github.com/tmp/marketplace/x/mlcoin/types"
+    _ "github.com/tmp/marketplace/x/sovereign/module"
+
 	_ "github.com/tmp/marketplace/x/treasury/module"
 	treasurymoduletypes "github.com/tmp/marketplace/x/treasury/types"
+	_ "github.com/tmp/marketplace/x/vault/module"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
