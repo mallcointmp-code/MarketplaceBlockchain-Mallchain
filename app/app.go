@@ -1,9 +1,6 @@
 package app
 
 import (
-	"crypto/sha256"
-	"encoding/binary"
-	"fmt"
 	"io"
 
 	clienthelpers "cosmossdk.io/client/v2/helpers"
@@ -28,7 +25,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -50,24 +46,13 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
 	"github.com/tmp/marketplace/docs"
-	badgemodulekeeper "github.com/tmp/marketplace/x/badge/keeper"
-	mallcoinmodulekeeper "github.com/tmp/marketplace/x/mallcoin/keeper"
-	mallpointsmodulekeeper "github.com/tmp/marketplace/x/mallpoints/keeper"
-	mlcointypes "github.com/tmp/marketplace/x/mlcoin/types"
-	sovereignante "github.com/tmp/marketplace/x/sovereign/ante"
-	sovereignkeeper "github.com/tmp/marketplace/x/sovereign/keeper"
-	sovereignmodule "github.com/tmp/marketplace/x/sovereign/module"
-	treasurymodulekeeper "github.com/tmp/marketplace/x/treasury/keeper"
-	treasurymodule "github.com/tmp/marketplace/x/treasury/module"
-	// vault module is intentionally not injected into the App struct to avoid
-	// direct dependency on the vault keeper in the runtime wiring.
 )
 
 const (
 	// Name is the name of the application.
 	Name = "marketplace"
 	// AccountAddressPrefix is the prefix for accounts addresses.
-	AccountAddressPrefix = "mp"
+	AccountAddressPrefix = "cosmos"
 	// ChainCoinType is the coin type of the chain.
 	ChainCoinType = 118
 )
@@ -113,13 +98,7 @@ type App struct {
 	TransferKeeper      ibctransferkeeper.Keeper
 
 	// simulation manager
-	sm               *module.SimulationManager
-	MallcoinKeeper   *mallcoinmodulekeeper.Keeper
-	MlcoinKeeper     mlcointypes.MlcoinKeeper
-	MallpointsKeeper *mallpointsmodulekeeper.Keeper
-	BadgeKeeper      *badgemodulekeeper.Keeper
-	TreasuryKeeper   *treasurymodulekeeper.Keeper
-	SovereignKeeper  *sovereignkeeper.Keeper
+	sm *module.SimulationManager
 }
 
 func init() {
@@ -129,12 +108,19 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 // AppConfig returns the default app config.
 func AppConfig() depinject.Config {
-	return depinject.Configs(appConfig)
+	return depinject.Configs(
+		appConfig,
+		depinject.Supply(
+			// supply custom module basics
+			map[string]module.AppModuleBasic{
+				genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
+			},
+		),
+	)
 }
 
 // New returns a reference to an initialized App.
@@ -150,33 +136,30 @@ func New(
 		app        = &App{}
 		appBuilder *runtime.AppBuilder
 
-		// Note: pass AppConfig and other DI options directly to depinject.Inject
-		// instead of composing them into a single Config to avoid duplicate
-		// provisioning of internal depinject types.
+		// merge the AppConfig and other configuration in one config
+		appConfig = depinject.Configs(
+			AppConfig(),
+			depinject.Supply(
+				appOpts, // supply app options
+				logger,  // supply logger
+
+				// Supply with IBC keeper getter for the IBC modules with App Wiring.
+				// The IBC Keeper cannot be passed because it has not been initiated yet.
+				// Passing the getter, the app IBC Keeper will always be accessible.
+				// This needs to be removed after IBC supports App Wiring.
+				app.GetIBCKeeper,
+
+				// here alternative options can be supplied to the DI container.
+				// those options can be used f.e to override the default behavior of some modules.
+				// for instance supplying a custom address codec for not using bech32 addresses.
+				// read the depinject documentation and depinject module wiring for more information
+				// on available options and how to use them.
+			),
+		)
 	)
 
 	var appModules map[string]appmodule.AppModule
-	// compose a single depinject.Config from AppConfig and runtime supplies
-	diCfg := depinject.Configs(
-		AppConfig(),
-		depinject.Supply(
-			appOpts,
-			logger,
-			app.GetIBCKeeper,
-			map[string]module.AppModuleBasic{
-				genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
-			},
-		),
-		// explicitly provide treasury and sovereign module providers for wiring
-		depinject.Provide(
-			treasurymodule.ProvideModule,
-		),
-		depinject.Provide(
-			sovereignmodule.ProvideModule,
-		),
-	)
-
-	if err := depinject.Inject(diCfg,
+	if err := depinject.Inject(appConfig,
 		&appBuilder,
 		&appModules,
 		&app.appCodec,
@@ -195,118 +178,20 @@ func New(
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.ParamsKeeper,
-		&app.MallcoinKeeper,
-		&app.MlcoinKeeper,
-		&app.MallpointsKeeper,
-		&app.BadgeKeeper,
-		&app.SovereignKeeper,
 	); err != nil {
 		panic(err)
 	}
-
-	// create sovereign ante decorator (runs before the standard ante handler)
-	sovDec := sovereignante.NewSovereignLockDecorator(app.SovereignKeeper)
 
 	// add to default baseapp options
 	// enable optimistic execution
 	baseAppOptions = append(baseAppOptions, baseapp.SetOptimisticExecution())
 
-	// build an AnteHandler using the SDK's default auth ante handler and
-	// wrap it to emit lightweight audit events (and provide scaffolding for
-	// rate-limiting and replay-protection). We create the ante handler here
-	// because we have access to the required keepers from depinject above.
-	anteHandler, err := authante.NewAnteHandler(authante.HandlerOptions{
-		AccountKeeper:   app.AuthKeeper,
-		BankKeeper:      app.BankKeeper,
-		SignModeHandler: app.txConfig.SignModeHandler(),
-		SigGasConsumer:  authante.DefaultSigVerificationGasConsumer,
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	// wrappedAnte emits an audit event and delegates to the SDK ante handler.
-	wrappedAnte := func(ctx sdk.Context, tx sdk.Tx, simulate bool) (sdk.Context, error) {
-		// Emit a simple audit event with minimal info (no sensitive data)
-		ev := sdk.NewEvent("tx_audit",
-			sdk.NewAttribute("num_msgs", fmt.Sprintf("%d", len(tx.GetMsgs()))),
-			sdk.NewAttribute("simulate", fmt.Sprintf("%t", simulate)),
-			sdk.NewAttribute("height", fmt.Sprintf("%d", ctx.BlockHeight())),
-		)
-		ctx.EventManager().EmitEvent(ev)
-
-		// Rate limiting: per-sender per-block limit
-		const perAddrPerBlockLimit = 10
-
-		// use mlcoin module KV store to keep ante-related keys
-		storeKey := app.GetKey("mlcoin")
-		if storeKey != nil {
-			store := ctx.KVStore(storeKey)
-
-			// global rate-limit key per-block
-			rlKey := []byte("ante:global:count")
-			val := store.Get(rlKey)
-			var storedHeight uint64
-			var count uint64
-			if val != nil && len(val) == 16 {
-				storedHeight = binary.BigEndian.Uint64(val[:8])
-				count = binary.BigEndian.Uint64(val[8:16])
-			}
-			curH := uint64(ctx.BlockHeight())
-			if storedHeight < curH {
-				// reset for new block
-				storedHeight = curH
-				count = 1
-			} else {
-				count++
-			}
-			if count > perAddrPerBlockLimit {
-				return ctx, fmt.Errorf("rate limit exceeded for address")
-			}
-			// write back
-			buf := make([]byte, 16)
-			binary.BigEndian.PutUint64(buf[:8], storedHeight)
-			binary.BigEndian.PutUint64(buf[8:16], count)
-			store.Set(rlKey, buf)
-
-			// replay protection: hash tx bytes and ensure not seen before
-			if encoder := app.txConfig.TxEncoder(); encoder != nil {
-				if b, err := encoder(tx); err == nil {
-					h := sha256.Sum256(b)
-					replayKey := append([]byte("ante:replay:"), h[:]...)
-					if store.Has(replayKey) {
-						return ctx, fmt.Errorf("replayed transaction")
-					}
-					// mark replay seen with current height
-					heightBuf := make([]byte, 8)
-					binary.BigEndian.PutUint64(heightBuf, curH)
-					store.Set(replayKey, heightBuf)
-				}
-			}
-		}
-
-		// Delegate to sovereign decorator which then calls the standard ante handler
-		return sovDec.AnteHandle(ctx, tx, simulate, anteHandler)
-	}
-
-	// We will set the ante handler on the built app below (after Build())
-
 	// build app
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
-
-	// set the wrapped ante handler (audit + scaffold for rate-limiting)
-	app.App.SetAnteHandler(wrappedAnte)
 
 	// register legacy modules
 	if err := app.registerIBCModules(appOpts); err != nil {
 		panic(err)
-	}
-
-	// retrieve treasury keeper from app modules if present
-	if m, ok := appModules["treasury"]; ok {
-		if am, ok := m.(treasurymodule.AppModule); ok {
-			app.TreasuryKeeper = am.K
-		}
 	}
 
 	/****  Module Options ****/
