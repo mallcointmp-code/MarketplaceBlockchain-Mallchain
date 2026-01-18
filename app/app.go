@@ -46,6 +46,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
 	"github.com/tmp/marketplace/docs"
+	treasurymodulekeeper "github.com/tmp/marketplace/x/treasury/keeper"
 )
 
 const (
@@ -98,7 +99,8 @@ type App struct {
 	TransferKeeper      ibctransferkeeper.Keeper
 
 	// simulation manager
-	sm *module.SimulationManager
+	sm             *module.SimulationManager
+	TreasuryKeeper *treasurymodulekeeper.Keeper
 }
 
 func init() {
