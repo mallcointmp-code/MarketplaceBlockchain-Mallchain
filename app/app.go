@@ -53,9 +53,14 @@ import (
 	badgemodulekeeper "github.com/tmp/marketplace/x/badge/keeper"
 	mallcoinmodulekeeper "github.com/tmp/marketplace/x/mallcoin/keeper"
 	mallpointsmodulekeeper "github.com/tmp/marketplace/x/mallpoints/keeper"
-	mlcoinmodulekeeper "github.com/tmp/marketplace/x/mlcoin/keeper"
+	mlcointypes "github.com/tmp/marketplace/x/mlcoin/types"
+	sovereignante "github.com/tmp/marketplace/x/sovereign/ante"
+	sovereignkeeper "github.com/tmp/marketplace/x/sovereign/keeper"
+	sovereignmodule "github.com/tmp/marketplace/x/sovereign/module"
 	treasurymodulekeeper "github.com/tmp/marketplace/x/treasury/keeper"
-	vaultmodulekeeper "github.com/tmp/marketplace/x/vault/keeper"
+	treasurymodule "github.com/tmp/marketplace/x/treasury/module"
+	// vault module is intentionally not injected into the App struct to avoid
+	// direct dependency on the vault keeper in the runtime wiring.
 )
 
 const (
@@ -109,12 +114,12 @@ type App struct {
 
 	// simulation manager
 	sm               *module.SimulationManager
-	MallcoinKeeper   mallcoinmodulekeeper.Keeper
-	MlcoinKeeper     mlcoinmodulekeeper.Keeper
-	MallpointsKeeper mallpointsmodulekeeper.Keeper
-	BadgeKeeper      badgemodulekeeper.Keeper
-	VaultKeeper      vaultmodulekeeper.Keeper
-	TreasuryKeeper   treasurymodulekeeper.Keeper
+	MallcoinKeeper   *mallcoinmodulekeeper.Keeper
+	MlcoinKeeper     mlcointypes.MlcoinKeeper
+	MallpointsKeeper *mallpointsmodulekeeper.Keeper
+	BadgeKeeper      *badgemodulekeeper.Keeper
+	TreasuryKeeper   *treasurymodulekeeper.Keeper
+	SovereignKeeper  *sovereignkeeper.Keeper
 }
 
 func init() {
@@ -124,19 +129,12 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+
 }
 
 // AppConfig returns the default app config.
 func AppConfig() depinject.Config {
-	return depinject.Configs(
-		appConfig,
-		depinject.Supply(
-			// supply custom module basics
-			map[string]module.AppModuleBasic{
-				genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
-			},
-		),
-	)
+	return depinject.Configs(appConfig)
 }
 
 // New returns a reference to an initialized App.
@@ -153,8 +151,8 @@ func New(
 		appBuilder *runtime.AppBuilder
 
 		// merge the AppConfig and other configuration in one config
-		appConfig = depinject.Configs(
-			AppConfig(),
+		diCfg := depinject.Configs(
+			appConfig,
 			depinject.Supply(
 				appOpts, // supply app options
 				logger,  // supply logger
@@ -170,12 +168,27 @@ func New(
 				// for instance supplying a custom address codec for not using bech32 addresses.
 				// read the depinject documentation and depinject module wiring for more information
 				// on available options and how to use them.
+
+				// supply custom module basics
+				map[string]module.AppModuleBasic{
+					genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
+				},
+
+				// supply treasury module provider explicitly for app wiring
+				depinject.Provide(
+					treasurymodule.ProvideModule,
+				),
+
+				// supply sovereign module provider explicitly for app wiring
+				depinject.Provide(
+					sovereignmodule.ProvideModule,
+				),
 			),
 		)
 	)
 
 	var appModules map[string]appmodule.AppModule
-	if err := depinject.Inject(appConfig,
+	if err := depinject.Inject(diCfg,
 		&appBuilder,
 		&appModules,
 		&app.appCodec,
@@ -198,11 +211,13 @@ func New(
 		&app.MlcoinKeeper,
 		&app.MallpointsKeeper,
 		&app.BadgeKeeper,
-		&app.VaultKeeper,
-		&app.TreasuryKeeper,
+		&app.SovereignKeeper,
 	); err != nil {
 		panic(err)
 	}
+
+	// create sovereign ante decorator (runs before the standard ante handler)
+	sovDec := sovereignante.NewSovereignLockDecorator(app.SovereignKeeper)
 
 	// add to default baseapp options
 	// enable optimistic execution
@@ -282,9 +297,8 @@ func New(
 			}
 		}
 
-		// Delegate to standard ante handler
-
-		return anteHandler(ctx, tx, simulate)
+		// Delegate to sovereign decorator which then calls the standard ante handler
+		return sovDec.AnteHandle(ctx, tx, simulate, anteHandler)
 	}
 
 	// We will set the ante handler on the built app below (after Build())
@@ -298,6 +312,13 @@ func New(
 	// register legacy modules
 	if err := app.registerIBCModules(appOpts); err != nil {
 		panic(err)
+	}
+
+	// retrieve treasury keeper from app modules if present
+	if m, ok := appModules["treasury"]; ok {
+		if am, ok := m.(treasurymodule.AppModule); ok {
+			app.TreasuryKeeper = am.K
+		}
 	}
 
 	/****  Module Options ****/
