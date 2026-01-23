@@ -7,6 +7,8 @@ const passport = require('passport');
 const session = require('express-session');
 
 const authRoutes = require('./routes/auth');
+const vaultRoutes = require('./routes/vault');
+const txRoutes = require('./routes/tx');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -23,6 +25,8 @@ require('./utils/passport');
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);
+app.use('/api/vault', vaultRoutes);
+app.use('/api/tx', txRoutes);
 
 app.get('/api/protected', require('./middleware/auth'), (req, res) => {
   res.json({ msg: 'protected', user: req.user });
