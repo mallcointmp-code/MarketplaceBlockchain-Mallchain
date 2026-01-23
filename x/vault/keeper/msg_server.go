@@ -8,10 +8,10 @@ import (
 
 type msgServer struct {
 	types.UnimplementedMsgServer
-	k Keeper
+	k *Keeper
 }
 
-func NewMsgServerImpl(k Keeper) types.MsgServer {
+func NewMsgServerImpl(k *Keeper) types.MsgServer {
 	return &msgServer{k: k}
 }
 

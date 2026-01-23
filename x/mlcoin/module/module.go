@@ -31,14 +31,14 @@ var (
 // AppModule implements the AppModule interface that defines the inter-dependent methods that modules need to implement
 type AppModule struct {
 	cdc        codec.Codec
-	keeper     keeper.Keeper
+	keeper     *keeper.Keeper
 	authKeeper types.AuthKeeper
 	bankKeeper types.BankKeeper
 }
 
 func NewAppModule(
 	cdc codec.Codec,
-	keeper keeper.Keeper,
+	keeper *keeper.Keeper,
 	authKeeper types.AuthKeeper,
 	bankKeeper types.BankKeeper,
 ) AppModule {
@@ -102,7 +102,10 @@ func (am AppModule) InitGenesis(ctx sdk.Context, _ codec.JSONCodec, gs json.RawM
 	var genState types.GenesisState
 	// Initialize global index to index in genesis state
 	if err := am.cdc.UnmarshalJSON(gs, &genState); err != nil {
-		panic(fmt.Errorf("failed to unmarshal %s genesis state: %w", types.ModuleName, err))
+		// fallback to standard encoding/json which ignores unknown fields
+		if err2 := json.Unmarshal(gs, &genState); err2 != nil {
+			panic(fmt.Errorf("failed to unmarshal %s genesis state: %w (fallback: %v)", types.ModuleName, err, err2))
+		}
 	}
 
 	if err := am.keeper.InitGenesis(ctx, genState); err != nil {

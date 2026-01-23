@@ -11,6 +11,8 @@ option go_package = "github.com/tmp/marketplace/x/vault/types";
 // Msg service for vault operations. NOTE: some fields are sensitive; ensure
 // operators understand privacy implications before exposing these txs on-chain.
 service Msg {
+  option (cosmos.msg.v1.service) = true;
+
   rpc SetupVault(MsgSetupVault) returns (MsgSetupVaultResponse) {}
   rpc ConfirmVault(MsgConfirmVault) returns (MsgConfirmVaultResponse) {}
   rpc UnlockAndSign(MsgUnlockAndSign) returns (MsgUnlockAndSignResponse) {}

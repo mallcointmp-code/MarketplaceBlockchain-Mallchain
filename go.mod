@@ -14,7 +14,7 @@ replace (
 require (
 	cosmossdk.io/api v0.9.2
 	cosmossdk.io/client/v2 v2.0.0-beta.11
-	cosmossdk.io/collections v1.2.1 // indirect
+	cosmossdk.io/collections v1.2.1
 	cosmossdk.io/core v0.11.3
 	cosmossdk.io/depinject v1.2.1
 	cosmossdk.io/errors v1.0.2
@@ -49,6 +49,11 @@ require (
 )
 
 require (
+	cosmossdk.io/x/tx v0.14.0
+	github.com/gogo/protobuf v1.3.2
+)
+
+require (
 	4d63.com/gocheckcompilerdirectives v1.3.0 // indirect
 	4d63.com/gochecknoglobals v0.2.2 // indirect
 	buf.build/gen/go/bufbuild/bufplugin/protocolbuffers/go v1.36.11-20250718181942-e35f9b667443.1 // indirect
@@ -76,7 +81,6 @@ require (
 	connectrpc.com/connect v1.19.1 // indirect
 	connectrpc.com/otelconnect v0.8.0 // indirect
 	cosmossdk.io/schema v1.1.0 // indirect
-	cosmossdk.io/x/tx v0.14.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/4meepo/tagalign v1.4.2 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
@@ -208,7 +212,6 @@ require (
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
 	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
-	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.2.5 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.5-0.20231225225746-43d5d4cd4e0e // indirect

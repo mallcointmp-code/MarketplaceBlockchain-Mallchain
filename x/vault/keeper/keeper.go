@@ -20,8 +20,8 @@ type Keeper struct {
 	cdc          codec.Codec
 }
 
-func NewKeeper(storeService corestore.KVStoreService, cdc codec.Codec) Keeper {
-	return Keeper{storeService: storeService, cdc: cdc}
+func NewKeeper(storeService corestore.KVStoreService, cdc codec.Codec) *Keeper {
+	return &Keeper{storeService: storeService, cdc: cdc}
 }
 
 // helper to get raw KV store for this module

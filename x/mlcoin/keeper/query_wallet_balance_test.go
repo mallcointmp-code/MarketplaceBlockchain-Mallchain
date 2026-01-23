@@ -28,7 +28,7 @@ func createNWalletBalance(keeper keeper.Keeper, ctx context.Context, n int) []ty
 
 func TestWalletBalanceQuerySingle(t *testing.T) {
 	f := initFixture(t)
-	qs := keeper.NewQueryServerImpl(f.keeper)
+	qs := keeper.NewQueryServerImpl(&f.keeper)
 	msgs := createNWalletBalance(f.keeper, f.ctx, 2)
 	tests := []struct {
 		desc     string
@@ -77,7 +77,7 @@ func TestWalletBalanceQuerySingle(t *testing.T) {
 
 func TestWalletBalanceQueryPaginated(t *testing.T) {
 	f := initFixture(t)
-	qs := keeper.NewQueryServerImpl(f.keeper)
+	qs := keeper.NewQueryServerImpl(&f.keeper)
 	msgs := createNWalletBalance(f.keeper, f.ctx, 5)
 
 	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllWalletBalanceRequest {

@@ -42,7 +42,7 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgTransferMallcoin,
-		mlcoinsimulation.SimulateMsgTransferMallcoin(am.authKeeper, am.bankKeeper, am.keeper, simState.TxConfig),
+		mlcoinsimulation.SimulateMsgTransferMallcoin(am.authKeeper, am.bankKeeper, *am.keeper, simState.TxConfig),
 	))
 
 	return operations

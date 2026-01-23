@@ -24,10 +24,10 @@ var (
 
 type AppModule struct {
 	cdc    codec.Codec
-	keeper keeper.Keeper
+	keeper *keeper.Keeper
 }
 
-func NewAppModule(cdc codec.Codec, k keeper.Keeper) AppModule {
+func NewAppModule(cdc codec.Codec, k *keeper.Keeper) AppModule {
 	return AppModule{cdc: cdc, keeper: k}
 }
 

@@ -11,6 +11,7 @@ import (
 
 	"github.com/tmp/marketplace/x/mallpoints/keeper"
 	"github.com/tmp/marketplace/x/mallpoints/types"
+	mlcoinmodulekeeper "github.com/tmp/marketplace/x/mlcoin/keeper"
 )
 
 var _ depinject.OnePerModuleType = AppModule{}
@@ -36,7 +37,7 @@ type ModuleInputs struct {
 	AuthKeeper   types.AuthKeeper
 	BankKeeper   types.BankKeeper
 	BadgeKeeper  types.BadgeKeeper
-	MlcoinKeeper types.MlcoinKeeper
+	MlcoinKeeper *mlcoinmodulekeeper.Keeper
 }
 
 type ModuleOutputs struct {

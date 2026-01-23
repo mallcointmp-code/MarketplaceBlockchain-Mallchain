@@ -13,7 +13,7 @@ import (
 
 func TestEmissionStateQuery(t *testing.T) {
 	f := initFixture(t)
-	qs := keeper.NewQueryServerImpl(f.keeper)
+	qs := keeper.NewQueryServerImpl(&f.keeper)
 	item := types.EmissionState{}
 	err := f.keeper.EmissionState.Set(f.ctx, item)
 	require.NoError(t, err)

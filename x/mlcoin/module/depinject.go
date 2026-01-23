@@ -40,7 +40,7 @@ type ModuleInputs struct {
 type ModuleOutputs struct {
 	depinject.Out
 
-	MlcoinKeeper keeper.Keeper
+	MlcoinKeeper *keeper.Keeper
 	Module       appmodule.AppModule
 }
 
@@ -56,7 +56,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.AddressCodec,
 		authority,
 	)
-	m := NewAppModule(in.Cdc, k, in.AuthKeeper, in.BankKeeper)
+	m := NewAppModule(in.Cdc, &k, in.AuthKeeper, in.BankKeeper)
 
-	return ModuleOutputs{MlcoinKeeper: k, Module: m}
+	return ModuleOutputs{MlcoinKeeper: &k, Module: m}
 }

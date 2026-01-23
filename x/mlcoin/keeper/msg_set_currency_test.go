@@ -14,7 +14,7 @@ import (
 func TestSetCurrencyRateGating(t *testing.T) {
 	f := initFixture(t)
 
-	srv := keeper.NewMsgServerImpl(f.keeper)
+	srv := keeper.NewMsgServerImpl(&f.keeper)
 	rv := reflect.ValueOf(srv)
 	m := rv.MethodByName("SetCurrencyRate")
 	require.True(t, m.IsValid(), "SetCurrencyRate method should exist on msg server")

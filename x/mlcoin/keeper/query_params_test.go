@@ -12,7 +12,7 @@ import (
 func TestParamsQuery(t *testing.T) {
 	f := initFixture(t)
 
-	qs := keeper.NewQueryServerImpl(f.keeper)
+	qs := keeper.NewQueryServerImpl(&f.keeper)
 	params := types.DefaultParams()
 	require.NoError(t, f.keeper.Params.Set(f.ctx, params))
 

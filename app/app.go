@@ -109,10 +109,10 @@ type App struct {
 	// simulation manager
 	sm               *module.SimulationManager
 	MallcoinKeeper   mallcoinmodulekeeper.Keeper
-	MlcoinKeeper     mlcoinmodulekeeper.Keeper
+	MlcoinKeeper     *mlcoinmodulekeeper.Keeper
 	MallpointsKeeper mallpointsmodulekeeper.Keeper
 	BadgeKeeper      badgemodulekeeper.Keeper
-	VaultKeeper      vaultmodulekeeper.Keeper
+	VaultKeeper      *vaultmodulekeeper.Keeper
 }
 
 func init() {
@@ -156,6 +156,8 @@ func New(
 			depinject.Supply(
 				appOpts, // supply app options
 				logger,  // supply logger
+				// supply a placeholder vault keeper so DI can resolve dependencies during startup
+				&vaultmodulekeeper.Keeper{},
 
 				// Supply with IBC keeper getter for the IBC modules with App Wiring.
 				// The IBC Keeper cannot be passed because it has not been initiated yet.
