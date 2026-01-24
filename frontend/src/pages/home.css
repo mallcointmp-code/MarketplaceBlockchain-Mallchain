@@ -1,9 +1,5 @@
-.home-root{display:flex;height:100vh;gap:18px;padding:18px;background:linear-gradient(180deg,#050814,#070b1f)}
-.home-sidebar{width:220px;background:rgba(11,15,22,0.6);border:1px solid rgba(255,255,255,0.04);border-radius:16px;padding:18px;color:#cfeee6;box-shadow:0 8px 40px rgba(2,6,23,0.6)}
-.home-sidebar .brand{font-weight:700;margin-bottom:12px}
-.sb-item{display:block;width:100%;padding:10px;border-radius:10px;background:transparent;color:#e6fef0;border:0;text-align:left;margin-bottom:8px}
-.sb-item.active{background:linear-gradient(90deg,#0b1220,#0f1724);box-shadow:0 8px 30px rgba(0,0,0,0.5)}
-.home-main{flex:1;display:flex;flex-direction:column;border-radius:16px;background:linear-gradient(180deg,rgba(10,14,20,0.6),rgba(8,10,14,0.6));border:1px solid rgba(255,255,255,0.04);padding:18px}
+.home-root{display:block;height:100vh;padding:18px;background:linear-gradient(180deg,#050814,#070b1f)}
+.home-main{display:flex;flex-direction:column;border-radius:16px;background:linear-gradient(180deg,rgba(10,14,20,0.6),rgba(8,10,14,0.6));border:1px solid rgba(255,255,255,0.04);padding:18px}
 .home-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .top-actions{display:flex;align-items:center;gap:12px}
 .search{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;color:#fff}

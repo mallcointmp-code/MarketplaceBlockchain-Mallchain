@@ -1,20 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import './home.css'
 
-function Sidebar() {
-  return (
-    <aside className="home-sidebar">
-      <div className="brand">Mallchain</div>
-      <nav>
-        <button className="sb-item active">Dashboard</button>
-        <button className="sb-item">Portfolio</button>
-        <button className="sb-item">Analysis</button>
-        <button className="sb-item">Community</button>
-      </nav>
-    </aside>
-  )
-}
-
 function TopBar() {
   return (
     <div className="home-topbar">
@@ -107,7 +93,6 @@ function HoldingsTable() {
 export default function Home(){
   return (
     <div className="home-root">
-      <Sidebar />
       <div className="home-main">
         <TopBar />
         <div className="home-content">
