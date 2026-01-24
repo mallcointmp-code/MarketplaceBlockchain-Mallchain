@@ -18,7 +18,23 @@ function Sidebar() {
 function TopBar() {
   return (
     <div className="home-topbar">
-      <h2>Welcome, Mall</h2>
+      <div style={{display:'flex', alignItems:'center'}}>
+        <button
+          className="back-btn"
+          aria-label="Back to landing"
+          onClick={() => {
+            try {
+              if (window && window.__landingNavigate) window.__landingNavigate('landing')
+              else window.location.href = '/'
+            } catch (e) { window.location.href = '/' }
+          }}
+        >
+          ←
+        </button>
+
+        <h2 style={{margin:0}}>Welcome, Mall</h2>
+      </div>
+
       <div className="top-actions">
         <input className="search" placeholder="Search" />
         <div className="avatar" />
