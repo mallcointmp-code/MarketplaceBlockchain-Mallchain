@@ -1,10 +1,21 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './landing.css'
+import Home from './Home'
 
 // replaced with Mallcoin and Mallpoint images from project assets
 
 export default function Landing(){
   const [menuOpen, setMenuOpen] = useState(false)
+
+  const [view, setView] = useState('landing')
+
+  useEffect(() => {
+    // listen for navigation signal from side menu
+    window.__landingNavigate = (v) => setView(v)
+    return () => { window.__landingNavigate = undefined }
+  }, [])
+
+  if (view === 'home') return <Home />
 
   return (
     <div className="scene" aria-hidden>
@@ -34,8 +45,20 @@ export default function Landing(){
         {/* side menu + overlay (slides from left) */}
         <aside className={`side-menu ${menuOpen ? 'open' : ''}`} aria-hidden={!menuOpen}>
           <nav>
-              <ul>
-              <li className="side-item">Home</li>
+            <ul>
+              <li className="side-item">
+                <button
+                  className="w-full text-left"
+                  onClick={() => {
+                    setMenuOpen(false)
+                    typeof window !== 'undefined' && window.requestAnimationFrame(() => {
+                      ;(window.__landingNavigate = window.__landingNavigate || ((v) => {}))( 'home' )
+                    })
+                  }}
+                >
+                  Home
+                </button>
+              </li>
               <li className="side-item">Vault</li>
               <li className="side-item">Transactions</li>
               <li className="side-item">Login</li>
