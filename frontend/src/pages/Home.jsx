@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import './home.css'
+import MallcoinDonut from '../components/MallcoinDonut'
 
 function TopBar() {
   return (
@@ -333,19 +334,21 @@ function DynamicChart() {
 
 function HoldingsTable() {
   const rows = [
-    ['Founder', '250,000,000 MLCN', '—'],
-    ['AFA', '1,500,000 MLCN', '—'],
-    ['Partner (Orthopharm)', '3,000,000 MLCN', '—'],
+    ['Founder', '250,000,000 MLCNS', '—'],
+    ['AFA', '1,500,000 MLCNS', '—'],
+    ['Partner (Orthopharm)', '3,000,000 MLCNS', '—'],
   ]
   return (
     <div>
       <h3>Watchlist</h3>
       <div className="watchlist">
         {rows.map((r, i) => (
-          <div className="watch-row" key={i}>
-            <span>{r[0]}</span>
-            <span>{r[1]}</span>
-            <span className={r[2].startsWith('+') ? 'up' : 'down'}>{r[2]}</span>
+          <div className="watch-row" key={i} style={{display:'flex', alignItems:'center'}}>
+            <span style={{flex:'0 0 auto'}}>{r[0]}</span>
+            <div style={{marginLeft:'auto', textAlign:'right', display:'flex', flexDirection:'column'}}>
+              <span style={{fontWeight:600}}>{r[1]}</span>
+              <span className={r[2].startsWith('+') ? 'up' : 'down'} style={{fontSize:12}}>{r[2]}</span>
+            </div>
           </div>
         ))}
       </div>
@@ -363,6 +366,9 @@ export default function Home(){
             <div className="main-grid">
               <div className="chart-card"><DynamicChart /></div>
               <div className="table-card"><HoldingsTable /></div>
+            </div>
+            <div style={{marginTop:20}}>
+              <MallcoinDonut />
             </div>
           </div>
       </div>
