@@ -124,4 +124,31 @@ async function getTotalSupply(req, res) {
   }
 }
 
-module.exports = { getMarketPrice, getTotalSupply }
+async function getMonthlyEmissions(req, res) {
+  try {
+    const base = CHAIN_REST.replace(/\/$/, '')
+    const url = `${base}/tmp/marketplace/mlcoin/v1/emission_state`
+    const resp = await axios.get(url, { timeout: 5000 })
+    const data = resp.data || {}
+    const es = data.emission_state || data.emissionState || null
+    if (!es) return res.status(502).json({ error: 'no emission_state in chain response', raw: data })
+
+    // monthly_cap is provided in base units (1e6). Return a 12-month array using the on-chain cap.
+    const rawMonthly = Number(es.monthly_cap || es.monthlyCap || 0)
+    const monthly = rawMonthly / 1_000_000
+
+    const months = []
+    const currentMonthOnChain = Number(es.current_month || es.currentMonth || 0)
+    for (let m = 1; m <= 12; m++) {
+      const has_emitted = currentMonthOnChain >= m && monthly > 0
+      months.push({ month: m, supply: monthly, has_emitted })
+    }
+
+    return res.json({ months, raw_proto: es })
+  } catch (err) {
+    return res.status(502).json({ error: 'failed to fetch on-chain emission_state', details: String(err) })
+  }
+}
+
+module.exports = { getMarketPrice, getTotalSupply, getMonthlyEmissions }
+

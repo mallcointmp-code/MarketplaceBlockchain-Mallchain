@@ -27,8 +27,9 @@ function TopBar() {
 function StatsCards() {
   const [supply, setSupply] = useState('12,304.11')
     const [circulating, setCirculating] = useState('4,500')
-  const [selectedRange, setSelectedRange] = useState('1h')
+  const [selectedRange, setSelectedRange] = useState('24h')
   const [market, setMarket] = useState({ market_price: null, history: [], aggregates: {} })
+  const [monthlyEmissions, setMonthlyEmissions] = useState([])
 
   useEffect(() => {
     let mounted = true
@@ -55,6 +56,22 @@ function StatsCards() {
         const j = await res.json()
         if (!mounted) return
         setMarket(j || {})
+      } catch (e) {}
+    }
+    load()
+    return () => { mounted = false }
+  }, [])
+
+  useEffect(() => {
+    let mounted = true
+    const base = import.meta.env.VITE_API_BASE || ''
+    const load = async () => {
+      try {
+        const res = await fetch(`${base}/api/market/monthly_emissions`)
+        if (!res.ok) return
+        const j = await res.json()
+        if (!mounted) return
+        setMonthlyEmissions((j && j.months) || [])
       } catch (e) {}
     }
     load()
@@ -111,14 +128,74 @@ function StatsCards() {
 
     return (
       <div style={{display:'flex',flexDirection:'column',gap:8}}>
-        <div style={{Display:'flex',alignItems:'center',gap:8, color}}><span style={{fontSize:14}}>{arrow}</span><span>{display}</span></div>
-        <div style={{display:'flex',flexWrap:'wrap'}}>
-          {Object.keys(RANGES).map(k => (
-            <button key={k} onClick={() => setSelectedRange(k)} aria-pressed={k===selectedRange} style={{marginRight:6, marginBottom:6, padding:'2px 8px', fontSize:12, background:k===selectedRange? '#eef2ff':'transparent', border:'1px solid #e5e7eb', borderRadius:6, display:'inline-flex', alignItems:'center', gap:6}}>
-              <span style={{fontSize:12, opacity:0.8}}>⏱️</span>
-              <span>{k}</span>
-            </button>
+        <div style={{display:'flex',alignItems:'center',gap:8, color}}>
+          <span style={{fontSize:14}}>{arrow}</span>
+          <span>{display}</span>
+        </div>
+        <div>
+          <select aria-label="Price range" value={selectedRange} onChange={(e) => setSelectedRange(e.target.value)} style={{padding:'6px 8px', borderRadius:6, border:'1px solid #e5e7eb', fontSize:13}}>
+            {Object.keys(RANGES).map(k => (
+              <option key={k} value={k}>{k}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+    )
+  }
+
+  function MonthDetails() {
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    const now = new Date()
+    const currentMonth = now.getMonth() + 1
+    const [selectedMonth, setSelectedMonth] = useState(currentMonth)
+    if (!monthlyEmissions || !monthlyEmissions.length) return <div>—</div>
+    const m = monthlyEmissions.find(x => Number(x.month) === Number(selectedMonth)) || monthlyEmissions[0]
+    const supply = Number(m.supply || 0)
+    const hasEmitted = Boolean(m.has_emitted || m.hasEmitted)
+    if (!hasEmitted) {
+      return (
+        <div style={{display:'flex',flexDirection:'column',gap:8}}>
+          <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))} style={{padding:6,borderRadius:6}}>
+            {monthlyEmissions.map(mm => (
+              <option key={mm.month} value={mm.month}>{monthNames[(Number(mm.month) - 1) % 12] || `M${mm.month}`}</option>
+            ))}
+          </select>
+          <div style={{fontSize:13, color:'#6b7280'}}>No emission data for this month.</div>
+        </div>
+      )
+    }
+    let outAlready = 0
+    if (Number(selectedMonth) < currentMonth) {
+      outAlready = supply
+    } else if (Number(selectedMonth) > currentMonth) {
+      outAlready = 0
+    } else {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1)
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+      const frac = Math.max(0, Math.min(1, (now - start) / (end - start)))
+      outAlready = Math.round(supply * frac)
+    }
+    const remaining = Math.max(0, supply - outAlready)
+    return (
+      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+        <select value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))} style={{padding:6,borderRadius:6}}>
+          {monthlyEmissions.map(mm => (
+            <option key={mm.month} value={mm.month}>{monthNames[(Number(mm.month) - 1) % 12] || `M${mm.month}`}</option>
           ))}
+        </select>
+        <div style={{display:'flex',flexDirection:'column',gap:4,fontSize:13}}>
+          <div style={{display:'flex',justifyContent:'space-between'}}>
+            <div style={{opacity:0.85}}>Emitted (cap)</div>
+            <div style={{fontWeight:600}}>{supply.toLocaleString()}</div>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between'}}>
+            <div style={{opacity:0.85}}>Out already</div>
+            <div style={{fontWeight:600}}>{outAlready.toLocaleString()}</div>
+          </div>
+          <div style={{display:'flex',justifyContent:'space-between'}}>
+            <div style={{opacity:0.85}}>Remaining</div>
+            <div style={{fontWeight:600}}>{remaining.toLocaleString()}</div>
+          </div>
         </div>
       </div>
     )
@@ -128,7 +205,7 @@ function StatsCards() {
     { label: 'Total Supply of Mallcoins', value: supply },
       { label: 'Circulating Supply', value: circulating },
     { label: 'Price Change', value: <PriceChangeValue /> },
-    { label: 'Active Assets', value: '12' },
+    { label: 'Monthly Emitted MLNCS', value: <MonthDetails /> },
   ]
   return (
     <div className="stats-grid">
