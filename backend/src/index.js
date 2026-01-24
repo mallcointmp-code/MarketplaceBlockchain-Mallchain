@@ -9,6 +9,7 @@ const session = require('express-session');
 const authRoutes = require('./routes/auth');
 const vaultRoutes = require('./routes/vault');
 const txRoutes = require('./routes/tx');
+const marketRoutes = require('./routes/market');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -27,6 +28,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/vault', vaultRoutes);
 app.use('/api/tx', txRoutes);
+app.use('/api/market', marketRoutes);
 
 app.get('/api/protected', require('./middleware/auth'), (req, res) => {
   res.json({ msg: 'protected', user: req.user });
