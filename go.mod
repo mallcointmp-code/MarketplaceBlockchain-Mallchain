@@ -48,10 +48,7 @@ require (
 	google.golang.org/protobuf v1.36.11
 )
 
-require (
-	cosmossdk.io/x/tx v0.14.0
-	github.com/gogo/protobuf v1.3.2
-)
+require cosmossdk.io/x/tx v0.14.0
 
 require (
 	4d63.com/gocheckcompilerdirectives v1.3.0 // indirect
@@ -212,6 +209,7 @@ require (
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
 	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.2.5 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.5-0.20231225225746-43d5d4cd4e0e // indirect
