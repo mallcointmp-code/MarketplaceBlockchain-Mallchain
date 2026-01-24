@@ -3,7 +3,7 @@ import './home.css'
 
 function TopBar() {
   return (
-    <div className="home-topbar">
+      <div className="home-topbar">
       <div style={{display:'flex', alignItems:'center'}}>
         <button
           className="back-btn"
@@ -19,11 +19,6 @@ function TopBar() {
         </button>
 
         <h2 style={{margin:0}}>Welcome, Mall</h2>
-      </div>
-
-      <div className="top-actions">
-        <input className="search" placeholder="Search" />
-        <div className="avatar" />
       </div>
     </div>
   )
