@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './landing.css'
 import Home from './Home'
+import Mallcoin from './Mallcoin'
 
 // replaced with Mallcoin and Mallpoint images from project assets
 
@@ -65,7 +66,12 @@ export default function Landing(){
 
               {/* CTAs added below the menu items */}
               <li className="side-item cta"><button className="menu-cta">TASK to earn</button></li>
-              <li className="side-item cta"><button className="menu-cta secondary">Mallcoin</button></li>
+              <li className="side-item cta"><button className="menu-cta secondary" onClick={() => {
+                setMenuOpen(false)
+                typeof window !== 'undefined' && window.requestAnimationFrame(() => {
+                  ;(window.__landingNavigate = window.__landingNavigate || ((v) => {}))( 'mallcoin' )
+                })
+              }}>Mallcoin</button></li>
             </ul>
           </nav>
         </aside>

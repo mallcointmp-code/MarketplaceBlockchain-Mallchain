@@ -203,10 +203,10 @@ function StatsCards() {
   }
 
   const stats = [
-    { label: 'Total Supply of Mallcoins', value: supply },
+    { label: 'Total Supply ', value: supply },
       { label: 'Circulating Supply', value: circulating },
     { label: 'Price Change', value: <PriceChangeValue /> },
-    { label: 'Monthly Emitted MLNCS', value: <MonthDetails /> },
+    { label: ' Emitted This Month ', value: <MonthDetails /> },
   ]
   return (
     <div className="stats-grid">
@@ -357,6 +357,32 @@ function HoldingsTable() {
 }
 
 export default function Home(){
+  const [monthlyDonutData, setMonthlyDonutData] = useState(null)
+  const [weeklyDonutData, setWeeklyDonutData] = useState(null)
+  const [dailyDonutData, setDailyDonutData] = useState(null)
+
+  useEffect(() => {
+    let mounted = true
+    const base = import.meta.env.VITE_API_BASE || ''
+    fetch(`${base}/api/market/monthly_breakdown`).then(r => r.json()).then(j => {
+      if (!mounted) return
+      const months = (j && j.months) || []
+      if (months.length) {
+        const latest = months[months.length - 1]
+        const monthly = { totalSupply: Number(latest.total || 0), bought: Number(latest.bought || 0), minted: Number(latest.minted_conversion || 0), awarded: Number(latest.awarded || 0) }
+        setMonthlyDonutData(monthly)
+
+        // derive weekly/daily by proportional split of the month's total
+        const weeklyFactor = 1 / 4
+        const dailyFactor = 1 / 30
+        const weekly = { totalSupply: Number((monthly.totalSupply * weeklyFactor).toFixed(6)), bought: Number((monthly.bought * weeklyFactor).toFixed(6)), minted: Number((monthly.minted * weeklyFactor).toFixed(6)), awarded: Number((monthly.awarded * weeklyFactor).toFixed(6)) }
+        const daily = { totalSupply: Number((monthly.totalSupply * dailyFactor).toFixed(6)), bought: Number((monthly.bought * dailyFactor).toFixed(6)), minted: Number((monthly.minted * dailyFactor).toFixed(6)), awarded: Number((monthly.awarded * dailyFactor).toFixed(6)) }
+        setWeeklyDonutData(weekly)
+        setDailyDonutData(daily)
+      }
+    }).catch(() => {})
+    return () => { mounted = false }
+  }, [])
   return (
     <div className="home-root">
       <div className="home-main">
@@ -368,7 +394,7 @@ export default function Home(){
               <div className="table-card"><HoldingsTable /></div>
             </div>
             <div style={{marginTop:20}}>
-              <MallcoinDonut />
+              <MallcoinDonut data={monthlyDonutData} />
             </div>
           </div>
       </div>

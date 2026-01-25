@@ -1,3 +1,33 @@
+const axios = require('axios')
+
+const CHAIN_REST = process.env.CHAIN_REST || 'http://127.0.0.1:1317'
+
+exports.list = async (req, res) => {
+  res.json({ txs: [] })
+}
+
+exports.get = async (req, res) => {
+  res.json({ id: req.params.id })
+}
+
+exports.create = async (req, res) => {
+  // existing authenticated create flow (not implemented here)
+  res.status(201).json({ created: true })
+}
+
+exports.relay = async (req, res) => {
+  // Accept signed tx JSON and forward to chain REST (gateway) endpoint
+  // Expected body: { creator, to, amount, signature, public_key }
+  try{
+    const signed = req.body
+    const url = `${CHAIN_REST}/tmp/marketplace/mlcoin/v1/transfer`
+    const r = await axios.post(url, signed)
+    res.json({ forwarded: true, resp: r.data })
+  }catch(e){
+    console.error('relay error', e.message || e)
+    res.status(502).json({ error: 'relay_failed', detail: e.message })
+  }
+}
 const Tx = require('../models/transaction');
 
 exports.list = async (req, res) => {
