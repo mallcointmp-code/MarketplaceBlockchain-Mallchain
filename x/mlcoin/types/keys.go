@@ -26,4 +26,6 @@ var (
 	KesBalanceKey       = collections.NewPrefix("kesBalance/value/")
 	TradeHistoryKey     = collections.NewPrefix("tradeHistory/value/")
 	CurrencyRateKey     = collections.NewPrefix("currencyRate/value/")
+	// AccountKey is the prefix for stored account metadata (pubkey, nonce)
+	AccountKey = collections.NewPrefix("account/value/")
 )

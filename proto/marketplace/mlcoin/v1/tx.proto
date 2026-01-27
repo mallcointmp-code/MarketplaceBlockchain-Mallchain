@@ -26,6 +26,9 @@ service Msg {
   
   // SellMallcoin defines the SellMallcoin RPC for selling MLCN for KES.
   rpc SellMallcoin(MsgSellMallcoin) returns (MsgSellMallcoinResponse);
+
+  // MintMallcoin allows an authority to mint MLCN to a recipient address.
+  rpc MintMallcoin(MsgMintMallcoin) returns (MsgMintMallcoinResponse);
 }
 
 // Admin: set currency rate (rate is scaled by 100, e.g., 13745 = 137.45 KES)
@@ -65,10 +68,7 @@ message MsgTransferMallcoin {
   string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   uint64 amount = 2;
   string to = 3;
-  // optional detached signature of the payload (hex or bytes)
-  bytes signature = 4;
-  // optional public key (hex string) used to verify signature
-  string public_key = 5;
+
 }
 
 // MsgTransferMallcoinResponse defines the MsgTransferMallcoinResponse message.

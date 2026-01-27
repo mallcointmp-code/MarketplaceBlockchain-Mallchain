@@ -61,7 +61,8 @@ const (
 	// Name is the name of the application.
 	Name = "marketplace"
 	// AccountAddressPrefix is the prefix for accounts addresses.
-	AccountAddressPrefix = "mp"
+	// Use "mall" so bech32 addresses look like mall1... per production config.
+	AccountAddressPrefix = "mall"
 	// ChainCoinType is the coin type of the chain.
 	ChainCoinType = 118
 )

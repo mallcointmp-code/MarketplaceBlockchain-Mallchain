@@ -19,4 +19,5 @@ var (
 	ErrTransactionNotFound = errors.Register(ModuleName, 1108, "transaction not found")
 	ErrInvalidRequest      = errors.Register(ModuleName, 1109, "invalid request")
 	ErrUnauthorized        = errors.Register(ModuleName, 1110, "unauthorized")
+	ErrInvalidSignature    = errors.Register(ModuleName, 1111, "invalid signature")
 )

@@ -21,9 +21,14 @@ type Keeper struct {
 	// Typically, this should be the x/gov module account.
 	authority []byte
 
+	// external keepers
+	authKeeper types.AuthKeeper
+	bankKeeper types.BankKeeper
+
 	Schema           collections.Schema
 	Params           collections.Item[types.Params]
 	WalletBalance    collections.Map[string, types.WalletBalance]
+	// Accounts collection removed; use the standard AuthKeeper for account/state
 	EmissionState    collections.Item[types.EmissionState]
 	Transactions     collections.Map[string, types.Transaction]
 	TransactionCount collections.Sequence
@@ -42,6 +47,8 @@ func NewKeeper(
 	addressCodec address.Codec,
 	authority []byte,
 
+	authKeeper types.AuthKeeper,
+	bankKeeper types.BankKeeper,
 ) Keeper {
 	if _, err := addressCodec.BytesToString(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address %s: %s", authority, err))
@@ -54,9 +61,12 @@ func NewKeeper(
 		cdc:          cdc,
 		addressCodec: addressCodec,
 		authority:    authority,
+		authKeeper:   authKeeper,
+		bankKeeper:   bankKeeper,
 
 		Params:           collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.Params](cdc)),
 		WalletBalance:    collections.NewMap(sb, types.WalletBalanceKey, "walletBalance", collections.StringKey, codec.CollValue[types.WalletBalance](cdc)),
+		// Accounts collection removed; account management is handled by AuthKeeper
 		EmissionState:    collections.NewItem(sb, types.EmissionStateKey, "emissionState", codec.CollValue[types.EmissionState](cdc)),
 		Transactions:     collections.NewMap(sb, types.TransactionKey, "transactions", collections.StringKey, codec.CollValue[types.Transaction](cdc)),
 		TransactionCount: collections.NewSequence(sb, types.TransactionCountKey, "transactionCount"),

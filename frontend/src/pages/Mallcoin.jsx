@@ -1,29 +1,21 @@
 import React from 'react'
-import MallcoinDonut from '../components/MallcoinDonut'
-import './landing.css'
-import CreateWallet from '../components/CreateWallet'
-import UnlockWallet from '../components/UnlockWallet'
-import SignAndSend from '../components/SignAndSend'
-import { useState } from 'react'
 
 export default function Mallcoin(){
-  const [wallet, setWallet] = useState(null)
-  const [privHex, setPrivHex] = useState(null)
-
   return (
-    <div style={{padding:24}}>
-      <h2>Mallcoin</h2>
-      <p style={{color:'#6b7280'}}>Live Mallcoin breakdown (monthly / this week / today)</p>
-      <div style={{display:'flex',gap:24,marginTop:18,alignItems:'flex-start'}}>
-        <div style={{flex:1}}>
-          <MallcoinDonut />
-        </div>
-        <div style={{width:420,display:'flex',flexDirection:'column',gap:12}}>
-          <CreateWallet onCreate={(kp)=>{ setWallet(kp); setPrivHex(kp.priv) }} />
-          <UnlockWallet onUnlock={(p)=>setPrivHex(p)} />
-          <SignAndSend privHex={privHex} pubHex={wallet?.pub} onSent={(r)=>console.log('sent',r)} />
-        </div>
-      </div>
+    <div id="mallcoin-root" style={{position:'relative',minHeight:'100vh',overflow:'hidden'}}>
+      <div style={{
+        position:'absolute',
+        inset:0,
+        backgroundImage:"url('/assets/Mallcoin.png')",
+        backgroundSize:'cover',
+        backgroundPosition:'center',
+        filter:'blur(24px) saturate(0.7) brightness(0.6)',
+        transform:'scale(1.06)',
+        zIndex:0,
+        pointerEvents:'none'
+      }} />
+
+      <div style={{position:'relative',zIndex:1}} />
     </div>
   )
 }

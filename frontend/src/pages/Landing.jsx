@@ -17,6 +17,7 @@ export default function Landing(){
   }, [])
 
   if (view === 'home') return <Home />
+  if (view === 'mallcoin') return <Mallcoin />
 
   return (
     <div className="scene" aria-hidden>
@@ -68,9 +69,14 @@ export default function Landing(){
               <li className="side-item cta"><button className="menu-cta">TASK to earn</button></li>
               <li className="side-item cta"><button className="menu-cta secondary" onClick={() => {
                 setMenuOpen(false)
-                typeof window !== 'undefined' && window.requestAnimationFrame(() => {
-                  ;(window.__landingNavigate = window.__landingNavigate || ((v) => {}))( 'mallcoin' )
-                })
+                if (typeof window !== 'undefined') {
+                  // mark that this navigation came from the menu so the Mallcoin page
+                  // can react (e.g., hide wallet section)
+                  window.__landingNavFromMenu = true
+                  window.requestAnimationFrame(() => {
+                    ;(window.__landingNavigate = window.__landingNavigate || ((v) => {}))('mallcoin')
+                  })
+                }
               }}>Mallcoin</button></li>
             </ul>
           </nav>

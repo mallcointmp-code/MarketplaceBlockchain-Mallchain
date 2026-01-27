@@ -4,10 +4,12 @@ import (
 	"context"
 
 	errorsmod "cosmossdk.io/errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tmp/marketplace/x/mlcoin/types"
 )
 
 func (k msgServer) TransferMallcoin(ctx context.Context, msg *types.MsgTransferMallcoin) (*types.MsgTransferMallcoinResponse, error) {
+	// Validate Bech32 addresses
 	if _, err := k.addressCodec.StringToBytes(msg.Creator); err != nil {
 		return nil, errorsmod.Wrap(err, "invalid sender address")
 	}
@@ -16,45 +18,30 @@ func (k msgServer) TransferMallcoin(ctx context.Context, msg *types.MsgTransferM
 		return nil, errorsmod.Wrap(err, "invalid recipient address")
 	}
 
-	// Get sender balance
-	senderBalance, err := k.Keeper.WalletBalance.Get(ctx, msg.Creator)
+	// Signature verification and sequence checking are performed by the
+	// standard Cosmos SDK ante handler (ADR-036). Here we simply perform
+	// the application-level transfer using the Bank keeper.
+
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	sender, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
-		return nil, errorsmod.Wrap(types.ErrWalletNotFound, "sender wallet not found")
+		return nil, errorsmod.Wrap(err, "invalid sender bech32 address")
 	}
-
-	// Check if sender has sufficient balance
-	if senderBalance.Balance < msg.Amount {
-		return nil, errorsmod.Wrap(types.ErrInsufficientBalance, "insufficient Mallcoin balance")
-	}
-
-	// Get or create recipient balance
-	recipientBalance, err := k.Keeper.WalletBalance.Get(ctx, msg.To)
+	receiver, err := sdk.AccAddressFromBech32(msg.To)
 	if err != nil {
-		recipientBalance = types.WalletBalance{
-			Address: msg.To,
-			Balance: 0,
-			Locked:  0,
-		}
+		return nil, errorsmod.Wrap(err, "invalid recipient bech32 address")
 	}
 
-	// Transfer funds
-	senderBalance.Balance -= msg.Amount
-	recipientBalance.Balance += msg.Amount
+	// Amounts are stored in micro-units in this module. Use denom "mlc".
+	coins := sdk.NewCoins(sdk.NewInt64Coin("mlc", int64(msg.Amount)))
 
-	// Update balances
-	if err := k.Keeper.WalletBalance.Set(ctx, msg.Creator, senderBalance); err != nil {
-		return nil, err
-	}
-	if err := k.Keeper.WalletBalance.Set(ctx, msg.To, recipientBalance); err != nil {
-		return nil, err
+	if err := k.Keeper.bankKeeper.SendCoins(sdkCtx, sender, receiver, coins); err != nil {
+		return nil, errorsmod.Wrap(err, "failed to send coins")
 	}
 
-	// Record transaction on blockchain
-	txID, err := k.Keeper.RecordTransaction(ctx, msg.Creator, msg.To, msg.Amount, "transfer", "P2P transfer")
-	if err != nil {
-		// Log error but don't fail the transfer
-		// Transaction is already completed, just recording failed
-	}
+	// Record transaction on blockchain (recording is best-effort)
+	txID, _ := k.Keeper.RecordTransaction(ctx, msg.Creator, msg.To, msg.Amount, "transfer", "P2P transfer")
 
 	return &types.MsgTransferMallcoinResponse{TxId: txID}, nil
 }

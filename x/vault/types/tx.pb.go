@@ -4,15 +4,19 @@
 package types
 
 import (
+	context "context"
 	fmt "fmt"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-
 	_ "github.com/cosmos/cosmos-proto"
 	_ "github.com/cosmos/cosmos-sdk/types/msgservice"
 	_ "github.com/cosmos/gogoproto/gogoproto"
+	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
+	io "io"
+	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -503,9 +507,193 @@ var fileDescriptor_62733f43e31364a6 = []byte{
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
-// gRPC client/server stubs are provided by tx_grpc.pb.go (protoc-gen-go-grpc)
-// to avoid duplicate or conflicting service registrations when both
-// gogoproto and protoc-gen-go-grpc generated files are present.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// MsgClient is the client API for Msg service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type MsgClient interface {
+	SetupVault(ctx context.Context, in *MsgSetupVault, opts ...grpc.CallOption) (*MsgSetupVaultResponse, error)
+	ConfirmVault(ctx context.Context, in *MsgConfirmVault, opts ...grpc.CallOption) (*MsgConfirmVaultResponse, error)
+	UnlockAndSign(ctx context.Context, in *MsgUnlockAndSign, opts ...grpc.CallOption) (*MsgUnlockAndSignResponse, error)
+	DisableVault(ctx context.Context, in *MsgDisableVault, opts ...grpc.CallOption) (*MsgDisableVaultResponse, error)
+}
+
+type msgClient struct {
+	cc grpc1.ClientConn
+}
+
+func NewMsgClient(cc grpc1.ClientConn) MsgClient {
+	return &msgClient{cc}
+}
+
+func (c *msgClient) SetupVault(ctx context.Context, in *MsgSetupVault, opts ...grpc.CallOption) (*MsgSetupVaultResponse, error) {
+	out := new(MsgSetupVaultResponse)
+	err := c.cc.Invoke(ctx, "/marketplace.vault.v1.Msg/SetupVault", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) ConfirmVault(ctx context.Context, in *MsgConfirmVault, opts ...grpc.CallOption) (*MsgConfirmVaultResponse, error) {
+	out := new(MsgConfirmVaultResponse)
+	err := c.cc.Invoke(ctx, "/marketplace.vault.v1.Msg/ConfirmVault", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UnlockAndSign(ctx context.Context, in *MsgUnlockAndSign, opts ...grpc.CallOption) (*MsgUnlockAndSignResponse, error) {
+	out := new(MsgUnlockAndSignResponse)
+	err := c.cc.Invoke(ctx, "/marketplace.vault.v1.Msg/UnlockAndSign", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DisableVault(ctx context.Context, in *MsgDisableVault, opts ...grpc.CallOption) (*MsgDisableVaultResponse, error) {
+	out := new(MsgDisableVaultResponse)
+	err := c.cc.Invoke(ctx, "/marketplace.vault.v1.Msg/DisableVault", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// MsgServer is the server API for Msg service.
+type MsgServer interface {
+	SetupVault(context.Context, *MsgSetupVault) (*MsgSetupVaultResponse, error)
+	ConfirmVault(context.Context, *MsgConfirmVault) (*MsgConfirmVaultResponse, error)
+	UnlockAndSign(context.Context, *MsgUnlockAndSign) (*MsgUnlockAndSignResponse, error)
+	DisableVault(context.Context, *MsgDisableVault) (*MsgDisableVaultResponse, error)
+}
+
+// UnimplementedMsgServer can be embedded to have forward compatible implementations.
+type UnimplementedMsgServer struct {
+}
+
+func (*UnimplementedMsgServer) SetupVault(ctx context.Context, req *MsgSetupVault) (*MsgSetupVaultResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetupVault not implemented")
+}
+func (*UnimplementedMsgServer) ConfirmVault(ctx context.Context, req *MsgConfirmVault) (*MsgConfirmVaultResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfirmVault not implemented")
+}
+func (*UnimplementedMsgServer) UnlockAndSign(ctx context.Context, req *MsgUnlockAndSign) (*MsgUnlockAndSignResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnlockAndSign not implemented")
+}
+func (*UnimplementedMsgServer) DisableVault(ctx context.Context, req *MsgDisableVault) (*MsgDisableVaultResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DisableVault not implemented")
+}
+
+func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
+	s.RegisterService(&_Msg_serviceDesc, srv)
+}
+
+func _Msg_SetupVault_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetupVault)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetupVault(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/marketplace.vault.v1.Msg/SetupVault",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetupVault(ctx, req.(*MsgSetupVault))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_ConfirmVault_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgConfirmVault)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).ConfirmVault(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/marketplace.vault.v1.Msg/ConfirmVault",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).ConfirmVault(ctx, req.(*MsgConfirmVault))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UnlockAndSign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUnlockAndSign)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UnlockAndSign(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/marketplace.vault.v1.Msg/UnlockAndSign",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UnlockAndSign(ctx, req.(*MsgUnlockAndSign))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DisableVault_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDisableVault)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DisableVault(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/marketplace.vault.v1.Msg/DisableVault",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DisableVault(ctx, req.(*MsgDisableVault))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var Msg_serviceDesc = _Msg_serviceDesc
+var _Msg_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "marketplace.vault.v1.Msg",
+	HandlerType: (*MsgServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SetupVault",
+			Handler:    _Msg_SetupVault_Handler,
+		},
+		{
+			MethodName: "ConfirmVault",
+			Handler:    _Msg_ConfirmVault_Handler,
+		},
+		{
+			MethodName: "UnlockAndSign",
+			Handler:    _Msg_UnlockAndSign_Handler,
+		},
+		{
+			MethodName: "DisableVault",
+			Handler:    _Msg_DisableVault_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "marketplace/vault/v1/tx.proto",
+}
 
 func (m *MsgSetupVault) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
