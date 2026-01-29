@@ -40,9 +40,30 @@ export function generateRandomBytes(lenBytes = 32) {
 }
 
 // generate mnemonic from entropy (BIP39)
-export function generateMnemonic() {
-  const entropy = generateEntropy(256)
-  const hex = Buffer.from(entropy).toString('hex')
+export async function generateMnemonic(bits = 256) {
+  // Prefer the library generator which handles entropy generation cross-platform.
+  try {
+    if (typeof bip39.generateMnemonic === 'function') {
+      return bip39.generateMnemonic(bits)
+    }
+  } catch (e) {
+    // fall back to manual entropy path below
+    console.debug('bip39.generateMnemonic failed, falling back to manual entropy:', e && e.message)
+  }
+
+  const entropy = generateEntropy(bits)
+  let hex
+  if (typeof Buffer !== 'undefined' && typeof Buffer.from === 'function') {
+    hex = Buffer.from(entropy).toString('hex')
+  } else {
+    // Fallback for environments without Buffer
+    hex = Array.from(entropy).map((b) => b.toString(16).padStart(2, '0')).join('')
+  }
+  const expectedLen = (bits / 8) * 2
+  if (!hex || hex.length !== expectedLen) {
+    console.debug('generateMnemonic: unexpected entropy hex length', { expectedLen, got: hex ? hex.length : 0 })
+    throw new Error('Invalid entropy length')
+  }
   return bip39.entropyToMnemonic(hex)
 }
 

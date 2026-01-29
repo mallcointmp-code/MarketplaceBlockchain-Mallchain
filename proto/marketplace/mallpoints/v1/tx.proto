@@ -53,6 +53,10 @@ message MsgAwardPoints {
   string recipient = 2;
   uint64 amount = 3;
   string task_type = 4;
+  // pow is an opaque proof-of-work blob (e.g. hash output) produced by the client
+  bytes pow = 5;
+  // nonce is the numeric nonce used to produce the PoW
+  uint64 nonce = 6;
 }
 
 // MsgAwardPointsResponse defines the MsgAwardPointsResponse message.

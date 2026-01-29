@@ -103,3 +103,15 @@ message MsgSellMallcoinResponse {
   uint64 kes_received = 2; // Total KES received
   uint64 price = 3; // Price per MLCN at time of sale
 }
+
+// MintMallcoin allows an authority to mint MLCN to a recipient address.
+message MsgMintMallcoin {
+  option (cosmos.msg.v1.signer) = "authority";
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string recipient = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 amount = 3;
+}
+
+message MsgMintMallcoinResponse {
+  string tx_id = 1; // Tx id for the mint operation
+}

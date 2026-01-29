@@ -1,8 +1,14 @@
 package types
 
+import (
+	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
+
 // DefaultBurnWallet represents the BurnWallet default value.
-// TODO: Determine the default value.
-var DefaultBurnWallet string = "burn_wallet"
+// Empty string means no burn wallet configured.
+var DefaultBurnWallet string = ""
 
 // NewParams creates a new Params instance.
 func NewParams(
@@ -30,7 +36,15 @@ func (p Params) Validate() error {
 }
 
 // validateBurnWallet validates the BurnWallet parameter.
+// Empty value is allowed. If non-empty, it must be a valid bech32 account address.
 func validateBurnWallet(v string) error {
-	// TODO implement validation
+	if v == "" {
+		return nil
+	}
+
+	if _, err := sdk.AccAddressFromBech32(v); err != nil {
+		return fmt.Errorf("invalid burn wallet address: %w", err)
+	}
+
 	return nil
 }

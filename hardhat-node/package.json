@@ -1,0 +1,8 @@
+{
+  "name": "marketplace-hardhat-node",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "hardhat": "^3.1.5"
+  }
+}

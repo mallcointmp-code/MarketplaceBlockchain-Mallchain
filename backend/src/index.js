@@ -29,6 +29,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/vault', vaultRoutes);
 app.use('/api/tx', txRoutes);
 app.use('/api/market', marketRoutes);
+const mallwalletRoutes = require('./routes/mallwallet');
+app.use('/api/mallwallet', mallwalletRoutes);
 
 app.get('/api/protected', require('./middleware/auth'), (req, res) => {
   res.json({ msg: 'protected', user: req.user });
@@ -36,7 +38,8 @@ app.get('/api/protected', require('./middleware/auth'), (req, res) => {
 
 async function start() {
   const mongo = process.env.MONGO_URI || 'mongodb://localhost:27017/marketplace';
-  await mongoose.connect(mongo, { useNewUrlParser: true, useUnifiedTopology: true });
+  // Modern mongoose no longer accepts the legacy `useNewUrlParser`/`useUnifiedTopology` options here.
+  await mongoose.connect(mongo);
   console.log('Mongo connected');
   app.listen(PORT, () => console.log('Server listening on', PORT));
 }

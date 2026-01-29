@@ -3,16 +3,12 @@ package types
 import (
 	"context"
 
-	"cosmossdk.io/core/address"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 )
 
-// AuthKeeper defines the expected interface for the Auth module.
-type AuthKeeper interface {
-	AddressCodec() address.Codec
-	GetAccount(context.Context, sdk.AccAddress) sdk.AccountI // only used for simulation
-	// Methods imported from account should be defined here
-}
+// AuthKeeper is the concrete auth keeper type from the SDK used for wiring.
+type AuthKeeper = authkeeper.AccountKeeper
 
 // BankKeeper defines the expected interface for the Bank module.
 type BankKeeper interface {

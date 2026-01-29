@@ -3,27 +3,18 @@ package types
 import (
 	context "context"
 
-	"cosmossdk.io/core/address"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
 
-// AuthKeeper defines the expected interface for the Auth module.
-type AuthKeeper interface {
-	AddressCodec() address.Codec
-	GetAccount(sdk.Context, sdk.AccAddress) sdk.AccountI // only used for simulation
-	// Methods imported from account should be defined here
-}
+// AuthKeeper is the concrete auth keeper type from the SDK used for wiring.
+// Using a type alias ensures depinject resolves the same concrete type used
+// by the application (`app.AuthKeeper`).
+type AuthKeeper = authkeeper.AccountKeeper
 
-// BankKeeper defines the expected interface for the Bank module.
-type BankKeeper interface {
-	SpendableCoins(sdk.Context, sdk.AccAddress) sdk.Coins
-	SendCoins(sdk.Context, sdk.AccAddress, sdk.AccAddress, sdk.Coins) error
-	// MintCoins mints new coins into the module account.
-	MintCoins(sdk.Context, string, sdk.Coins) error
-	// SendCoinsFromModuleToAccount transfers coins from a module account to an account.
-	SendCoinsFromModuleToAccount(sdk.Context, string, sdk.AccAddress, sdk.Coins) error
-	// Methods imported from bank should be defined here
-}
+// BankKeeper is aliased to the SDK's BaseKeeper to ensure depinject resolves
+// the exact concrete type provided by the bank module.
+type BankKeeper = bankkeeper.BaseKeeper
 
 // ParamSubspace defines the expected Subspace interface for parameters.
 type ParamSubspace interface {

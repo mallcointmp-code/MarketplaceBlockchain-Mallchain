@@ -41,8 +41,8 @@ func initFixture(t *testing.T) *fixture {
 		encCfg.Codec,
 		addressCodec,
 		authority,
-		nil, // authKeeper (nil for unit tests)
-		nil, // bankKeeper (nil for unit tests)
+		types.AuthKeeper{},       // authKeeper (zero value for unit tests)
+		types.BankKeeper{},      // bankKeeper (zero value for unit tests)
 	)
 
 	// Initialize params
