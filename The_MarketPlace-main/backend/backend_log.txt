@@ -1,0 +1,82 @@
+
+> the-marketplace-backend@1.0.0 start
+> node ./app.js
+
+[redis] connecting to redis://127.0.0.1:6379
+[init] limiter loaded but is not a function
+[mount] /api/seller -> ./routes/seller.js (esm-import)
+[mount] /api/auth -> ./routes/auth.js (type=function)
+[mount] /api/users -> ./routes/users.js (type=function)
+[mount] /api/stats -> ./routes/stats.js (type=function)
+[mount] /api/tasks -> ./routes/tasks.js (type=function)
+[mount] /api/qr -> ./routes/qr.js (type=function)
+[mount] /api/badges -> ./routes/badge.js (type=function)
+[mount] /api/employer-jobs -> ./routes/employerJobs.js (type=function)
+[mount] /api/adminJobs -> ./routes/adminJobs.js (type=function)
+[mount] /api/reviews -> ./routes/reviews.js (type=function)
+[mount] /api/analytics -> ./routes/analytics.js (type=function)
+[mount] /api/delivery -> ./routes/delivery.js (type=function)
+[mount] /api/agent -> ./routes/agent.js (type=function)
+[mount] /api/web3 -> ./routes/web3.js (type=function)
+[mount] /api/investments -> ./routes/bugbounty.js (type=function)
+[mount] /api/fraud -> ./routes/fraud.js (type=function)
+[mount] /api/disputes -> ./routes/disputes.js (type=function)
+[mount] /api/notification -> ./routes/notification.js (type=function)
+[mount] /api/pin -> ./routes/pin.js (type=function)
+[mount] /api/posts -> ./routes/posts.js (type=function)
+[mount] /api/referral -> ./routes/referral.js (type=function)
+[mount] /api/shops -> ./routes/shops.js (type=function)
+[mount] /api/session -> ./routes/session.js (type=function)
+[mount] /api/tasksAdmin -> ./routes/tasksAdmin.js (type=function)
+[mount] /api/tasksCreator -> ./routes/tasksCreator.js (type=function)
+[mount] /api/admin -> ./routes/adminPenalty.js (type=function)
+[mount] /api/admin/redis -> ./routes/redisStats.js (type=function)
+[mount] /api/admin/migration-results -> ./routes/migrationResults.js (type=function)
+[mount] /api/admin/migration -> ./routes/migration.js (type=function)
+[mount] /api/admin/audit -> ./routes/adminAudit.js (type=function)
+[mount] /api/admin/tasks -> ./routes/adminTasksConfig.js (type=function)
+[mount] /api/receipt -> ./routes/receipt.js (type=function)
+Twilio init failed: accountSid must start with AC
+[mount][error] /api/jobs -> ./routes/jobs.js : uploadCV.single is not a function
+[mount] /api/wallet -> ./routes/wallet.js (type=function)
+[mount] /api/taskUser -> ./routes/taskUser.js (type=function)
+[mount] /api/metrics -> ./routes/metrics.js (type=function)
+[mount] /api/profile -> ./routes/profile.js (type=function)
+[mount] /api/uploads -> ./routes/uploads.js (type=function)
+[mount] /api/analytics -> ./routes/analytics.js (type=function)
+[mount] /api/orthopharm/admin -> ./routes/orthopharmAdmin.js (type=function)
+[mount] /api/orthopharm/employee -> ./routes/orthopharmEmployee.js (type=function)
+[mount] /api/supermarket/worker -> ./routes/supermarketWorker.js (type=function)
+[mount] /api/orthopharm/review -> ./routes/orthopharmReview.js (type=function)
+[mount] /api/orthopharm/notification -> ./routes/orthopharmNotification.js (type=function)
+[mount] /api/orthopharm/appointment -> ./routes/orthopharmAppointment.js (type=function)
+[mount] /api/supermarket/admin -> ./routes/supermarketAdmin.js (type=function)
+[mount] /api/receipts -> ./routes/receipts.js (type=function)
+[mount] /api/ads -> ./routes/ads.js (type=function)
+[mount] /api/ads/track -> ./routes/adTracking.js (type=function)
+[mount] /api/ads/v2 -> ./routes/advertisements.js (type=function)
+[mount] /api/ads/v2
+[mount] /api/products -> ./routes/products.js (type=function)
+[mount] /api/demo -> ./routes/demoFunds.js (type=function)
+[mount] /api/cart -> ./routes/cart.js (type=function)
+[mount] /api/checkout -> ./routes/checkout.js (type=function)
+[mount] /api/mpesa -> ./routes/mpesa.js (type=function)
+[mount] /auth -> ./routes/oauth.js (type=function)
+✅ Server initialization complete
+[ethService] init failed invalid BytesLike value (argument="value", value="0xYOUR_DEPLOYER_PRIVATE_KEY_HERE", code=INVALID_ARGUMENT, version=6.16.0)
+Server with Socket.IO running on 5000
+[swagger] skipped: sw is not a function
+[jobs] conversionJob started
+[redis] connect event
+[redis] connecting to redis://127.0.0.1:6379
+✅ MongoDB connected
+[redis] ready
+[redis] connected
+Killed
+npm error Lifecycle script `start` failed with error:
+npm error code 137
+npm error path /home/lervez/Downloads/Download/Commercial/Avas/The_Market_Place_1.0/backend
+npm error workspace the-marketplace-backend@1.0.0
+npm error location /home/lervez/Downloads/Download/Commercial/Avas/The_Market_Place_1.0/backend
+npm error command failed
+npm error command sh -c node ./app.js

@@ -1,0 +1,43 @@
+{
+  "app_name": "<appd>",
+  "app_version": "",
+  "genesis_time": "2026-01-24T07:34:29.661886044Z",
+  "chain_id": "testing-1",
+  "initial_height": 1,
+  "app_hash": null,
+  "app_state": {
+    "06-solomachine": null,
+    "07-tendermint": null,
+    "auth": {
+      "params": {
+        "max_memo_characters": "256",
+        "tx_sig_limit": "7",
+        "tx_size_cost_per_byte": "10",
+        "sig_verify_cost_ed25519": "590",
+        "sig_verify_cost_secp256k1": "1000"
+      },
+      "accounts": [
+        {
+          "@type": "/cosmos.auth.v1beta1.BaseAccount",
+          "address": "mall19wzy4k7zj9cluyhtgv27wt68au8753d3tvacud",
+          "pub_key": null,
+          "account_number": "0",
+          "sequence": "0"
+        },
+        {
+          "@type": "/cosmos.auth.v1beta1.BaseAccount",
+          "address": "mall1tjnauualswenkqhdked5dn0yvsc6artwxyl8n6",
+          "pub_key": null,
+          "account_number": "0",
+          "sequence": "0"
+        }
+      ]
+    },
+    "authz": {
+      "authorization": []
+    },
+    "badge": {
+      "params": {}
+    }
+  }
+}

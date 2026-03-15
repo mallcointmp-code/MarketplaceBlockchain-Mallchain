@@ -7,3 +7,7 @@ release/
 *.dot
 *.log
 *.ign
+build/
+node_modules
+node_modules
+marketplaced

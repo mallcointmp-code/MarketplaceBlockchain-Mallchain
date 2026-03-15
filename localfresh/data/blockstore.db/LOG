@@ -1,0 +1,70 @@
+=============== Mar 4, 2026 (EAT) ===============
+15:17:04.011492 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+15:17:04.072446 db@open opening
+15:17:04.072698 version@stat F·[] S·0B[] Sc·[]
+15:17:04.106026 db@janitor F·2 G·0
+15:17:04.106047 db@open done T·33.581997ms
+=============== Mar 4, 2026 (EAT) ===============
+15:17:33.069241 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+15:17:33.069416 version@stat F·[] S·0B[] Sc·[]
+15:17:33.069434 db@open opening
+15:17:33.069469 journal@recovery F·1
+15:17:33.069520 journal@recovery recovering @1
+15:17:33.069653 version@stat F·[] S·0B[] Sc·[]
+15:17:33.156367 db@janitor F·2 G·0
+15:17:33.156383 db@open done T·86.943217ms
+15:21:42.368183 db@close closing
+15:21:42.368259 db@close done T·61.394µs
+=============== Mar 4, 2026 (EAT) ===============
+15:23:13.285380 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+15:23:13.285496 version@stat F·[] S·0B[] Sc·[]
+15:23:13.285510 db@open opening
+15:23:13.285545 journal@recovery F·1
+15:23:13.285601 journal@recovery recovering @2
+15:23:13.375577 memdb@flush created L0@4 N·276 S·43KiB "BH:..4a1,v123":"blo..ore,v6"
+15:23:13.375755 version@stat F·[1] S·43KiB[43KiB] Sc·[0.25]
+15:23:13.490597 db@janitor F·3 G·0
+15:23:13.490631 db@open done T·205.113115ms
+=============== Mar 4, 2026 (EAT) ===============
+16:05:02.050840 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:05:02.051572 version@stat F·[1] S·43KiB[43KiB] Sc·[0.25]
+16:05:02.051592 db@open opening
+16:05:02.051637 journal@recovery F·1
+16:05:02.051708 journal@recovery recovering @5
+16:05:02.305169 memdb@flush created L0@7 N·1704 S·265KiB "BH:..937,v652":"blo..ore,v283"
+16:05:02.305587 version@stat F·[2] S·308KiB[308KiB] Sc·[0.50]
+16:05:02.481593 db@janitor F·4 G·0
+16:05:02.481617 db@open done T·430.01694ms
+16:15:04.489484 table@compaction L0·2 -> L1·0 S·308KiB Q·2630
+16:15:04.688320 table@build created L1@10 N·1651 S·308KiB "BH:..937,v652":"blo..ore,v1981"
+16:15:04.688392 version@stat F·[0 1] S·308KiB[0B 308KiB] Sc·[0.00 0.00]
+16:15:04.813878 table@compaction committed F-1 S+66B Ke·0 D·329 T·293.569947ms
+16:15:04.814016 table@remove removed @4
+=============== Mar 8, 2026 (EAT) ===============
+12:37:58.873567 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+12:37:58.918438 version@stat F·[0 1] S·308KiB[0B 308KiB] Sc·[0.00 0.00]
+12:37:58.918460 db@open opening
+12:37:58.918544 journal@recovery F·1
+12:37:58.918625 journal@recovery recovering @8
+12:37:59.137362 memdb@flush created L0@11 N·4854 S·751KiB "BH:..a06,v6401":"blo..ore,v1988"
+12:37:59.138029 version@stat F·[1 1] S·1MiB[751KiB 308KiB] Sc·[0.25 0.00]
+12:37:59.365791 db@janitor F·5 G·1
+12:37:59.365804 db@janitor removing table-7
+12:37:59.365845 db@open done T·447.360839ms
+=============== Mar 8, 2026 (EAT) ===============
+13:05:15.843427 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+13:05:15.951941 version@stat F·[1 1] S·1MiB[751KiB 308KiB] Sc·[0.25 0.00]
+13:05:15.952001 db@open opening
+13:05:15.952125 journal@recovery F·1
+13:05:15.952245 journal@recovery recovering @12
+13:05:16.296672 memdb@flush created L0@14 N·582 S·91KiB "BH:..a25,v7290":"blo..ore,v6843"
+13:05:16.296883 version@stat F·[2 1] S·1MiB[842KiB 308KiB] Sc·[0.50 0.00]
+13:05:16.980500 db@janitor F·5 G·0
+13:05:16.980521 db@open done T·1.028512476s
+16:57:40.869412 memdb@flush N·15234 S·3MiB
+16:57:41.154338 memdb@flush created L0@18 N·15234 S·2MiB "BH:..a37,v17317":"blo..ore,v7426"
+16:57:41.154378 version@stat F·[3 1] S·3MiB[3MiB 308KiB] Sc·[0.75 0.00]
+16:57:41.269468 memdb@flush committed F·1 T·381.289419ms
+16:57:41.312689 journal@remove removed @15
+19:23:32.178972 db@close closing
+19:23:32.424667 db@close done T·245.690738ms

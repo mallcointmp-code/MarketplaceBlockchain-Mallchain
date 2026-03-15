@@ -1,0 +1,42 @@
+redis:
+  image: redis:7
+  restart: unless-stopped
+  ports:
+    - "6379:6379"
+  volumes:
+    - ./data/redis:/data
+
+# optional admin UI for Redis (starts on 8001)
+redis-commander:
+  image: rediscommander/redis-commander:latest
+  environment:
+    - REDIS_HOSTS=local:redis:6379
+  ports:
+    - "8001:8081"
+
+# Notes:
+# After bringing up the stack, init the replica set inside the mongo container:
+# docker-compose up -d
+
+# Updated mongo service with replica set initialization
+mongo:
+  container_name: the_market_place_redis
+  ports:
+    - "6379:6379"
+  volumes:
+    - ./data/redis:/data
+
+# optional: admin UI
+mongo-express:
+  image: mongo-express:1.0
+  environment:
+    ME_CONFIG_MONGODB_SERVER: mongo
+    ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+  ports:
+    - "8081:8081"
+  depends_on:
+    - mongo
+
+networks:
+  default:
+    driver: bridge
