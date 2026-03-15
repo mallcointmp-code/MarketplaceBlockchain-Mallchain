@@ -1,0 +1,28 @@
+=============== Mar 3, 2026 (EAT) ===============
+15:32:18.279349 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+15:32:18.400661 db@open opening
+15:32:18.400924 version@stat F·[] S·0B[] Sc·[]
+15:32:18.451121 db@janitor F·2 G·0
+15:32:18.451144 db@open done T·50.459438ms
+18:15:07.705348 db@close closing
+18:15:09.214635 db@close done T·1.509266875s
+=============== Mar 4, 2026 (EAT) ===============
+10:15:08.597081 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+10:15:08.679683 version@stat F·[] S·0B[] Sc·[]
+10:15:08.679808 db@open opening
+10:15:08.679904 journal@recovery F·1
+10:15:08.680023 journal@recovery recovering @1
+10:15:09.139837 memdb@flush created L0@2 N·11028 S·1MiB "BH:..1fa,v10425":"blo..ore,v6"
+10:15:09.140082 version@stat F·[1] S·1MiB[1MiB] Sc·[0.25]
+10:15:09.282827 db@janitor F·3 G·0
+10:15:09.282849 db@open done T·603.031369ms
+=============== Mar 4, 2026 (EAT) ===============
+11:35:26.798594 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+11:35:26.813732 version@stat F·[1] S·1MiB[1MiB] Sc·[0.25]
+11:35:26.813759 db@open opening
+11:35:26.813819 journal@recovery F·1
+11:35:26.814203 journal@recovery recovering @3
+11:35:27.114286 memdb@flush created L0@5 N·5370 S·835KiB "BH:..85c,v14410":"blo..ore,v11035"
+11:35:27.114527 version@stat F·[2] S·2MiB[2MiB] Sc·[0.50]
+11:35:27.407177 db@janitor F·4 G·0
+11:35:27.407196 db@open done T·593.427151ms

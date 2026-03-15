@@ -1,0 +1,20 @@
+=============== Mar 2, 2026 (EAT) ===============
+18:36:54.758734 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:36:54.841799 db@open opening
+18:36:54.842123 version@stat F·[] S·0B[] Sc·[]
+18:36:54.909228 db@janitor F·2 G·0
+18:36:54.909287 db@open done T·67.424827ms
+18:36:55.807055 db@close closing
+18:36:55.807132 db@close done T·78.765µs
+=============== Mar 4, 2026 (EAT) ===============
+15:09:29.165687 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+15:09:29.174833 version@stat F·[] S·0B[] Sc·[]
+15:09:29.174862 db@open opening
+15:09:29.174927 journal@recovery F·1
+15:09:29.174978 journal@recovery recovering @1
+15:09:29.206486 memdb@flush created L0@2 N·25 S·646B "s/k..ion,v12":"s/k..ion,v17"
+15:09:29.206752 version@stat F·[1] S·646B[646B] Sc·[0.25]
+15:09:29.491712 db@janitor F·3 G·0
+15:09:29.491755 db@open done T·316.868057ms
+15:09:30.191289 db@close closing
+15:09:30.191366 db@close done T·75.467µs

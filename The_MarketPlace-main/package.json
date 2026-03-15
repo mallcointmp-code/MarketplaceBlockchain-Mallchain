@@ -1,0 +1,30 @@
+{
+  "name": "the-marketplace-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -k --success=first --names BLOCKCHAIN,CHAIN-API,BACKEND,WORKERS,FRONTEND \"pnpm run dev:blockchain-node\" \"pnpm run dev:blockchain-api\" \"pnpm run dev:backend\" \"pnpm run worker:all\" \"pnpm run dev:frontend\"",
+    "dev:marketplace-only": "concurrently -k --success=first --names BACKEND,WORKERS,FRONTEND \"pnpm run dev:backend\" \"pnpm run worker:all\" \"pnpm run dev:frontend\"",
+    "dev:blockchain-node": "cd blockchain && export PATH=\"$PWD/../.go/bin:$PATH\" && export GOTOOLCHAIN=local && export TERM=dumb && yes | ignite chain serve --reset-once",
+    "dev:blockchain-api": "cd blockchain/backend && pnpm run dev",
+    "worker:all": "concurrently -k --success=first --names ASSIGN,REQUEUE \"pnpm --filter the-marketplace-backend run worker\" \"pnpm --filter the-marketplace-backend run worker:requeue\"",
+    "start:backend": "pnpm --filter the-marketplace-backend run start",
+    "dev:backend": "pnpm --filter the-marketplace-backend run dev",
+    "start:frontend": "pnpm --filter frontend run start",
+    "dev:frontend": "pnpm --filter frontend run dev",
+    "install:all": "pnpm install",
+    "health": "bash scripts/health_check.sh",
+    "stop": "bash scripts/stop_all.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.24.0",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

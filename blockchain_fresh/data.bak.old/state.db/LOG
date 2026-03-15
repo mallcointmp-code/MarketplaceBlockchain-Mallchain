@@ -1,0 +1,34 @@
+=============== Jan 26, 2026 (EAT) ===============
+14:07:09.916203 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+14:07:10.000002 db@open opening
+14:07:10.000309 version@stat F·[] S·0B[] Sc·[]
+14:07:10.033605 db@janitor F·2 G·0
+14:07:10.033625 db@open done T·33.5997ms
+=============== Jan 26, 2026 (EAT) ===============
+14:07:14.482192 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+14:07:14.482315 version@stat F·[] S·0B[] Sc·[]
+14:07:14.482332 db@open opening
+14:07:14.482365 journal@recovery F·1
+14:07:14.482605 journal@recovery recovering @1
+14:07:14.540569 memdb@flush created L0@2 N·1 S·4KiB "gen..Doc,v1":"gen..Doc,v1"
+14:07:14.542563 version@stat F·[1] S·4KiB[4KiB] Sc·[0.25]
+14:07:14.675286 db@janitor F·3 G·0
+14:07:14.675304 db@open done T·192.966234ms
+=============== Jan 26, 2026 (EAT) ===============
+14:08:38.271374 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+14:08:38.271514 version@stat F·[1] S·4KiB[4KiB] Sc·[0.25]
+14:08:38.271546 db@open opening
+14:08:38.271593 journal@recovery F·1
+14:08:38.271712 journal@recovery recovering @3
+14:08:38.272054 version@stat F·[1] S·4KiB[4KiB] Sc·[0.25]
+14:08:38.388854 db@janitor F·3 G·0
+14:08:38.388875 db@open done T·117.321027ms
+=============== Jan 26, 2026 (EAT) ===============
+14:11:01.391886 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+14:11:01.392307 version@stat F·[1] S·4KiB[4KiB] Sc·[0.25]
+14:11:01.392358 db@open opening
+14:11:01.392402 journal@recovery F·1
+14:11:01.392484 journal@recovery recovering @5
+14:11:01.392632 version@stat F·[1] S·4KiB[4KiB] Sc·[0.25]
+14:11:01.534252 db@janitor F·3 G·0
+14:11:01.534284 db@open done T·141.917448ms
